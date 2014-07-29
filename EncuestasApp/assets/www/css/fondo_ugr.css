@@ -1,0 +1,10 @@
+@font-face {
+    font-family: "customfont";
+    src: url("./ugr_background.png") format("opentype");   
+        /* Make sure you defined the correct path, which is related to
+            the location of your file `my_css.css` */ 
+    }
+    body {
+        font-family: "customfont";
+        font-size:30px;
+    }
