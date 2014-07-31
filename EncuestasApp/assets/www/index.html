@@ -1,3 +1,20 @@
+
+<!-- OpinaUGR Copyright (C) 2014  Alejandro Molina Salazar amolinasalazar@gmail.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,7 +46,7 @@
 <body>
 
 <!-- PAGINA LOGIN -->
-<div data-role="page" id="inicio" data-theme="b">
+<div data-role="page" id="inicio">
     
     <!-- CABECERA -->
 	<div data-role="header">
@@ -51,7 +68,7 @@
 </div>
 
 <!-- PAGINA HOME -->   
-<div data-role="page" id="home" data-theme="b">
+<div data-role="page" id="home">
  
 	<div data-role="header" data-position="inline">
 		<a href="#inicio" data-icon="delete" data-theme="a" class="ui-btn-left">Logout</a>
@@ -75,7 +92,7 @@
 </div>
 
 <!-- PAGINA INFO ENCUESTA -->
-<div data-role="page" id="info-fb" data-theme="b">
+<div data-role="page" id="info-fb">
  
 	<div data-role="header" data-position="inline">
 		<a href="#inicio" data-icon="delete" data-theme="a" class="ui-btn-left">Logout</a>
@@ -99,16 +116,17 @@
 </div>
 
 <!-- PAGINA FEEDBACK -->
-<div data-role="page" id="fb" data-theme="b">
+<div data-role="page" id="fb">
  
 	<div data-role="header" data-position="inline">
 		<a href="#inicio" data-icon="delete" data-theme="a" class="ui-btn-left">Logout</a>
 		<h1>Bienvenido</h1>
 	</div>
 	
-	<div data-role="content" id="fb_content">	
-	<!-- SE GENERA EL CONTENIDO -->
-	</div>
+	<form id="fb_content">
+		<p>(*)Es obligatorio responder a las preguntas señaladas con un asterisco.</p>
+		<!-- SE GENERA EL CONTENIDO -->
+	</form>
  
 </div>
 
@@ -309,10 +327,10 @@ $('#formulario').submit(function() {
                         	typ: 'multichoice'}];
 						
             			
-	            		moodleWSCall("local_fbplugin_complete_feedback", {feedbackid: 3, itemvalues: aux2}, function(fb_questions){
+	            		//moodleWSCall("local_fbplugin_complete_feedback", {feedbackid: 3, itemvalues: aux2}, function(fb_questions){
 	            		
 	            		
-	            		});
+	            		//});
             		//});
             		
             	});	
@@ -337,7 +355,7 @@ function cargarPaginaInfo(id_btn, fb){
 	else
 		info.innerHTML += "<dl><dt>Anónima: </dt><dd>No</dd>";
 		
-	// MULTICHOICE
+	// MULTIANSWER
 	if(fb[id_btn].multiple_submit==1)
 		info.innerHTML += "<dt>Multi-respuesta: </dt><dd>Sí</dd>";
 	else
@@ -369,7 +387,7 @@ function cargarPaginaInfo(id_btn, fb){
 	    	cargarFB(currentId, fb);
 		}
 	})();
-	a.setAttribute('href', '#fb');
+	//a.setAttribute('href', '#fb');
 	a.setAttribute('data-role', 'button');
 	a.setAttribute('data-icon', 'carat-r');
 	var texto = document.createTextNode("Comenzar Encuesta");
@@ -385,52 +403,199 @@ function cargarFB(id_btn, fb){
 	// Cargar preguntas
 	moodleWSCall("local_fbplugin_get_feedback_questions", {feedbackid: fb[id_btn].id}, function(fb_questions){
 		
-		var fb_content = document.getElementById("fb_content");
-		
-		// Creamos los elementos del FB
-		for(var i=0; i<fb_questions.lenght ;i++){
+		// Si hay alguna pregunta que contestar (PENDIENTE---------> comprobar que sean contestables)
+		if(fb_questions.length!=0){
 			
-			if(fb.questions.typ == "multichoice"){
+			var fb_content = document.getElementById("fb_content");
 				
-				// Creamos el fieldset
-				var fieldset = document.createElement("fieldset");
-				fieldset.setAttribute('data-role', 'controlgroup');
+			// Ordenamos las preguntas segun la posicion en la que deben mostrarse
+			fb_questions.sort(function(a, b){return a.position-b.position});
+			
+			// Creamos los elementos del FB
+			for(var i=0; i<fb_questions.length; i++){
 				
-				// Creamos legend (enunciado pregunta)
-				var legend = document.createElement("legend");
-				legend.innerHTML = "";
+				// Comprobamos si esta es una pregunta de respuesta obligatoria o no
+				var required = false;
+				if(fb_questions[i].required==1)
+					required = true;
 				
-				// Estructura del presentation:
-				// d>>>>>: lista desplegable
-				// r>>>>>: seleccion radio
-				// c>>>>>: check button
-				
-				// Cada respuesta
-				for(var j=0; j<fb.questions ; j++){
-					
-					var input = document.createElement("input");
-					input.setAttribute('type', 'radio');
-					input.setAttribute('id', 'radio');
-					input.setAttribute('value', '1');
-					var label = document.createElement("label");
-					label.setAttribute('for', '');
-					label.innerHTML = "";
-					
+				// LABEL
+				if(fb_questions[i].typ == "label"){				
+					fb_content.innerHTML += "<p>"+fb_questions[i].presentation+"</p>";
 				}
 				
+				// TEXTO CORTO
+				// rango caracteres: 5-255
+				if(fb_questions[i].typ == "textfield"){
+					
+					// Creamos el label (pregunta)
+					var label = document.createElement("label");
+					label.setAttribute('for', 'p'+i);
+					label.innerHTML = fb_questions[i].name;
+					if(required)
+						label.innerHTML += "*";
+					
+					// Creamos el input
+					var input = document.createElement("input");
+					input.setAttribute('type', 'text');
+					input.setAttribute('id', 'p'+i);
+					input.innerHTML = fb_questions[i].name;
+					
+					fb_content.appendChild(label);
+					fb_content.appendChild(input);
+				}
 				
+				// TEXTO LARGO
+				// filas*columnas
+				if(fb_questions[i].typ == "textarea"){
+					
+					// Creamos el label (pregunta)
+					var label = document.createElement("label");
+					label.setAttribute('for', 'p'+i);
+					label.innerHTML = fb_questions[i].name;
+					if(required)
+						label.innerHTML += "*";
+					
+					// Creamos el textarea
+					var textarea = document.createElement("textarea");
+					textarea.setAttribute('id', 'p'+i);
+					textarea.setAttribute('cols', '40');
+					textarea.setAttribute('rows', '8');
+					textarea.innerHTML = fb_questions[i].name;
+					
+					fb_content.appendChild(label);
+					fb_content.appendChild(textarea);
+				}
 				
-				fb_content.innerHTML =
+				// INPUT NUMERICO
+				if(fb_questions[i].typ == "numeric"){
+					
+					// Creamos el label (pregunta)
+					var label = document.createElement("label");
+					label.setAttribute('for', 'p'+i);
+					label.innerHTML = fb_questions[i].name+" (rango:"+fb_questions[i].presentation+")";
+					if(required)
+						label.innerHTML += "*";
+					
+					/// Creamos el input
+					var input = document.createElement("input");
+					input.setAttribute('type', 'number');
+					input.setAttribute('data-clear-btn', 'false');
+					input.setAttribute('pattern', '[0-9]*');
+					input.setAttribute('id', 'p'+i);
+					input.innerHTML = fb_questions[i].name;
+					
+					fb_content.appendChild(label);
+					fb_content.appendChild(input);
+				}
 				
-				
-			}
-			<fieldset data-role="controlgroup">
-    		<legend>Radio buttons, vertical controlgroup:</legend>
+				// MULTICHOICE
+				if(fb_questions[i].typ == "multichoice"){
+					
+					// Valor required->obligatorio o no
+					
+					// Estructura del presentation:
+					// d>>>>>: lista desplegable
+					// r>>>>>: seleccion radio
+					// c>>>>>: check button
+					// Al final:
+					// <<<<<1: visualizacion horizontal
+					// nada: visualizacion vertical
+					
+					// Options:
+					// i: No analiza los envios vacios
+					// h: la opcion "No Seleccionada" oculto
+					
+					// Eliminamos la cabecera del presentation (y la cola si la hubiera) 
+					var respuestas_juntas = fb_questions[i].presentation.substring(6, fb_questions[i].presentation.length);
+					// Contemplamos si la visualizacion es horizontal 
+					var horizontal = false;
+					if (respuestas_juntas.match(/<<<<<1/g) != null){ // vertical
+						respuestas_juntas = respuestas_juntas.substring(0, respuestas_juntas.length-6);
+						horizontal = true;
+					}
+					
+					// Guardamos cada posible respuesta en un vector
+					var respuestas = [];
+					respuestas = respuestas_juntas.split("|");
+					
+					//OPCIONES
+					// Contemplamos si existe la respuesta "No Seleccionada"
+					if(fb_questions[i].options.match(/h/g) == null){
+						respuestas.push("No Seleccionada");
+					}
+					
+					// Detectamos tipo de multichoice: radio o checkbox
+					if(fb_questions[i].presentation.charAt(0) == 'r' || fb_questions[i].presentation.charAt(0) == 'c'){
+						
+						if(fb_questions[i].presentation.charAt(0) == 'r')
+							var tipo_multi = "radio";
+						else
+							var tipo_multi = "checkbox";
+						
+						// Creamos el fieldset
+						var fieldset = document.createElement("fieldset");
+						fieldset.setAttribute('data-role', 'controlgroup');
+						if(horizontal)
+							fieldset.setAttribute('data-type', 'horizontal');
+						
+						// Creamos legend (enunciado pregunta)
+						var legend = document.createElement("legend");
+						legend.innerHTML = fb_questions[i].name;
+						if(required)
+							legend.innerHTML += "*";
+						
+						// Cada respuesta:
+						for(var j=0; j<respuestas.length ; j++){	
+							var input = document.createElement("input");
+							input.setAttribute('type', tipo_multi);
+							input.setAttribute('name', 'p'+i);
+							input.setAttribute('id', 'p'+i+'r'+j); // numero pregunta y respuesta
+							//input.setAttribute('value', '1');
+							var label = document.createElement("label");
+							label.setAttribute('for', 'p'+i+'r'+j);
+							label.innerHTML = respuestas[j];
+							legend.appendChild(label);	
+							legend.appendChild(input);			
+						}
+						
+						fieldset.appendChild(legend);
+						fb_content.appendChild(fieldset);
+						
+					}else{
+						// Lista desplegable (default)
+	
+						// Creamos el label general
+						var label = document.createElement("label");
+						label.setAttribute('for', 'p'+i+'r'+j);
+						label.setAttribute('class', 'select');
+						label.innerHTML = fb_questions[i].name;
+						if(required)
+							label.innerHTML += "*";
+						
+						// Creamos el select
+						var select = document.createElement("select");
+						select.setAttribute('data-native-menu', 'false');
+					
+						// Cada respuesta:
+						for(var j=0; j<respuestas.length ; j++){	
+							var option = document.createElement("option");
+							option.setAttribute('value', '1');
+							option.innerHTML = respuestas[j];
+							select.appendChild(option);
+						}
+						
+						fb_content.appendChild(label);
+						fb_content.appendChild(select);
+						
+					}
+					
+				} // end if
+			} // end for
+		}// end if
+		else{} // Si no hay preguntas que contestar
 		
-		
-		}
-		
-		
+		$.mobile.changePage("#fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"slide"});
 	});
 	
 }
