@@ -1,0 +1,285 @@
+<!-- 
+	© Universidad de Granada. Granada – 2014
+	© Rosana Montes Soldado y Alejandro Molina Salazar (amolinasalazar@gmail.com). Granada – 2014
+
+    This program is free software: you can redistribute it and/or 
+    modify it under the terms of the GNU General Public License as 
+    published by the Free Software Foundation, either version 3 of 
+    the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses>. -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpinaUGR</title>
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+    <link rel="stylesheet" href="js/jquery.mobile-1.4.3.min.css" />
+    <link rel="stylesheet" href="themes/OpinaUGR.min.css" />
+	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="js/jquery.mobile-1.4.3.min.js"></script>
+    <script src="js/cordova.js"></script>
+    <script src="js/functions.js"></script>
+
+</head>
+ 
+<body onLoad="cargarDatos()">
+
+<!-- PAGINA LOGIN -->
+<div data-role="page" id="inicio" data-theme="b">
+    
+    <!-- CABECERA -->
+	<div data-role="header">
+		<a href="#ayuda" class="ui-btn-right ui-btn ui-shadow ui-corner-all ui-icon-info ui-btn-icon-notext"></a>
+        <h1>OpinaUGR</h1>
+    </div>
+ 
+ 	<!-- CONTENIDO -->
+ 	<div data-role="content">
+		<form id="formulario">
+			<label>URL Sitio Moodle</label>
+			<input type="text" id="urlsitio" name="urlsitio" data-mini="true">
+	  		<label>Usuario</label>
+	  		<input type="text" id="nombredeusuario" name="nombredeusuario" data-mini="true">
+	  		<label>Contraseña</label>
+	 		<input type="password" id="clave" name="clave" data-mini="true">
+	 		<label>
+	 		<input id="check" name="check" type="checkbox" checked="checked" data-mini="true">Recordar
+	 		</label><br>
+	 		<input type="submit" value="Iniciar sesión" id="botonLogin">
+	 		<p style="text-align:center">Inicia sesión con tu usuario y contraseña asociada a tu perfil de Moodle.</p>
+		</form>	
+	</div>
+	
+</div>
+
+<!-- PAGINA HOME -->   
+<div data-role="page" id="home" data-theme="b">
+ 
+	<div data-role="header" data-position="inline">
+		<a href="#panel" data-icon="bars" class="ui-btn-left ui-btn ui-shadow ui-corner-all ui-icon-bars ui-btn-icon-notext"></a>
+		<h1>OpinaUGR</h1>
+		<button onclick="cargarHome();" class="ui-btn-right ui-btn ui-shadow ui-corner-all ui-icon-recycle ui-btn-icon-notext"></button>
+	</div>
+	
+	<div data-role="content">
+		<div class="ui-bar ui-bar-b">
+	    	<h3>Encuestas generales</h3>
+	  	</div>
+	  	<div class="ui-body ui-body-b" id="grupo_general">
+	    	
+	  	</div>
+	  	<div class="ui-bar ui-bar-b">
+	    	<h3>Encuestas asociadas a cursos</h3>
+	  	</div>
+	  	<div class="ui-body ui-body-b" id="grupo_cursos">
+
+	  	</div>
+	</div>
+	
+	<!-- PANEL -->
+	<div data-role="panel" id="panel" data-dismissible="true" data-theme="a" data-display="overlay">
+		<ul data-role="listview" data-divider-theme="a">
+				<li data-role="list-divider">Panel de Navegación</li>
+		    	<li><a href="#ayuda" data-role="button" data-transtion="slide" data-icon="info">Ayuda</a></li>
+		    	<li><a href="#acercade" data-role="button" data-transtion="slide" data-icon="comment">Acerca de</a></li>
+		    	<li><a data-rel="back" data-role="button" data-transtion="fade" data-icon="delete">Cerrar Sesion</a></li>
+		</ul>
+	</div><!-- /panel -->
+ 
+</div>
+
+<!-- PAGINA INFO ENCUESTA -->
+<div data-role="page" id="info-fb" data-theme="b">
+ 
+	<div data-role="header" data-position="inline" data-add-back-btn="true" data-back-btn-text="Atrás">
+		<h1>Información</h1>
+	</div>
+	
+	<div data-role="content" id="info">	
+	<!-- SE GENERA EL CONTENIDO -->
+	</div>
+</div>
+
+<!-- PAGINA FEEDBACK -->
+<div data-role="page" id="fb" data-theme="b">
+ 
+	<div data-role="header" data-position="inline">
+		<h1>Encuesta</h1>
+	</div>
+	
+	<div data-role="content">	
+		<form id="FBform">
+			<p>(*)Es obligatorio responder a las preguntas señaladas con un asterisco.</p>
+			<div class="ui-body ui-body-b ui-corner-all" id="fb_content">
+				<!-- SE GENERA EL CONTENIDO -->
+			</div>
+		</form>
+	</div>
+	
+	<fieldset id="btn_fb" class="ui-grid-a">
+		<div class="ui-block-a" id="btn_fb_cancelar"><!-- SE GENERA EL CONTENIDO --></div>
+		<div class="ui-block-b" id="btn_fb_enviar"><!-- SE GENERA EL CONTENIDO --></div>	   
+	</fieldset>
+ 
+</div>
+
+<!-- PAGINA ACERCA DE -->   
+<div data-role="page" id="acercade" data-theme="b" class"acercade" style="background-image:url('img/fondo.png');background-size: 100% auto; background-repeat: no-repeat;">
+ 
+	<div data-role="header" data-position="inline" data-add-back-btn="true" data-back-btn-text="Atrás">
+		<h1>Acerca de</h1>
+	</div>
+	
+	<div data-role="content">
+		
+		<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de apoyar a las nuevas tecnologías y
+		añadir una nueva herramienta a la comunidad universitaria.</p>
+		<p align="justify">Su objetivo es mejorar, flexibilizar y automatizar el uso de encuestas para permitir la recogida de opiniones, 
+		votaciones populares, resolución de problemas o la toma de decisiones.</p>
+		
+	 	<div class="ui-bar ui-bar-a">
+	  		Promovido por:
+	  	</div>
+		<div class="ui-body ui-body-b" style="margin-top: 5px; text-align:center">
+			<a onclick = "window.open(encodeURI('http://www.ugr.es/'), '_system');"><img src="img/ugr.png" style="max-width:100%;"/></a>
+		  	<a onclick = "window.open(encodeURI('http://www.ugr.es/'), '_system');" data-role="button" data-icon="carat-r" style="font-size: 14px;">Universidad de Granada</a>
+	  	</div>
+	  	
+	  	<div class="ui-body ui-body-b" style="margin-top: 5px; text-align:center">
+			<a onclick = "window.open(encodeURI('http://detic.ugr.es/'), '_system');"><img src="img/detic.png" style="max-width:100%;"/></a>
+		  	<a onclick = "window.open(encodeURI('http://detic.ugr.es/'), '_system');" data-role="button" data-icon="carat-r" style="font-size: 14px;" >Delegación del Rector para las TIC</a>
+	  	</div>
+	  	
+	  	<div class="ui-body ui-body-b" style="margin-top: 5px; text-align:center">
+			<a onclick = "window.open(encodeURI('http://cevug.ugr.es/'), '_system');"><img src="img/cevug.png" style="max-width:100%;"/></a>
+		  	<a onclick = "window.open(encodeURI('http://cevug.ugr.es/'), '_system');" data-role="button" data-icon="carat-r" style="font-size: 14px;">CEVUG</a>
+	  	</div>
+	  	
+	  	<p></p>
+	  
+		<div class="ui-bar ui-bar-a">
+	  		Desarrollado por:
+	  	</div>
+	 	<div class="ui-body ui-body-b" style="margin-top: 5px;">
+			<p>Alejandro Molina Salazar</p>
+		    <a href = "mailto:amolinasalazar@gmail.com" data-role="button" data-icon="carat-r" style="font-size: 14px;">Contactar</a>
+		</div>
+		
+		<p></p>
+		
+		<div class="ui-bar ui-bar-a">
+			Coordinado por:
+		</div>
+		<div class="ui-body ui-body-b" style="margin-top: 5px;">
+			<p>Rosana Montes Soldado</p>
+	 		<a onclick = "window.open(encodeURI('http://lsi.ugr.es/rosana/'), '_system');" data-role="button" data-icon="carat-r" style="font-size: 14px;" >Sitio Web</a>
+		</div>
+		
+		<br></br>
+		
+	   	<a class="item" onclick = "window.open(encodeURI('http://apps.ugr.es'), '_system');" data-role="button" data-icon="carat-r">
+	        Visitar catálogo AppsUGR
+		</a>
+		
+	</div>
+	
+	<div data-role="footer" data-position="inline" style="width:100%;text-align:center">
+		<p>Copyright UGR® 2014 v.1.0</p>
+	</div>
+	
+</div>
+
+<!-- AYUDA -->
+<div data-role="page" id="ayuda" data-theme="b">
+
+	<div data-role="header" data-position="inline" data-add-back-btn="true" data-back-btn-text="Atrás">
+		<h1>Ayuda</h1>
+	</div>
+
+	<div data-role="content">
+		<h1>¿Qué es OpinaUGR?</h1>
+		<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de apoyar a las nuevas tecnologías y
+		añadir una nueva herramienta a la comunidad universitaria. Su objetivo es mejorar, flexibilizar y automatizar
+		el uso de encuestas para permitir la recogida de opiniones, votaciones populares, resolución de problemas o la toma de decisiones.</p>
+		<h1>¿Cómo funciona OpinaUGR?</h1>
+		<p align="justify">OpinaUGR se sincroniza con tu perfil de Moodle (en el caso de la UGR, PRADO2) y descarga todas las encuestas que se asocien a tu perfil.
+		Al elegir una encuesta determinada, obtendremos una breve descripción de la misma que nos aportará algunos datos útiles como de si se trata 
+		de una encuesta de respuesta anónima o de si nos encontramos en el plazo adecuado para poder cumplimentarla. Si elegimos la opción de "Comenzar Encuesta", 
+		la app generará la encuesta para poder rellenarla y enviarla.</p>
+		<p align="justify">Así pues, para comenzar a realizar encuestas sólo será necesario que los usuarios dispongan de OpinaUGR en su terminal móvil y de un ordenador 
+			convencional con acceso a la plataforma Moodle para la creación de las encuestas y la visualización posterior de los resultados.</p>
+		<h1>¿Por qué usar OpinaUGR?</h1>
+		<p>3 razones:
+		<p align="justify">- Rapidez: usar OpinaUGR es la opción más rápida de acceder y responder a una encuesta, ya que evita las cargas de contenido innecesario que realiza un 
+			navegador web convencional y, además, ahorra el consumo de datos.</p>
+		<p align="justify">- App móvil: el disponer de la aplicación desde cualquier terminal móvil, ya sea un dispositivo con sistema operativo Android o IOS,
+		permite el acceso a la misma de forma fácil, inmediata y en cualquier lugar, sin tener que depender de un ordenador.</p>
+		<p align="justify">- Posibilidades: el acceso común a un encuesta de forma sencilla ofrece una serie de posibilidades como, por ejemplo, el dinamizar el transcurso de una 
+			clase retando a los alumnos con distintas pruebas a tiempo real, realizar consultas rápidas en una reunión docente o tomar una decisión complicada de manera anónima.</p>
+		<h1>¿A quién va dirigido OpinaUGR?</h1>
+		<p align="justify">A cualquier usuario de Moodle, tanto estudiantes como profesorado.</p>
+		<h1>¿Que tipo de elementos están soportados por la aplicación?</h1>
+		<p align="justify">La mayoría de los elementos clave para la creación encuestas estan soportados por la app, entre los que se encuentran:</p>
+		<p align="justify">- Etiqueta (label).</p>
+		<p align="justify">- Respuesta de texto corta (textfield).</p>
+		<p align="justify">- Respuestas de texto largas (textarea).</p>
+		<p align="justify">- Respuesta numérica (slider).</p>
+		<p align="justify">- Elección múltiple (multichoice): con sus diferentes versiones como son "Opción Multiple (una respuesta)" (radiobutton), 
+			"Opción Multiple (una respuesta-lista desplegable)" (selectlist) y "Elección Múltiple (varias respuestas)" (checkbox).</p>
+		<p align="justify">Actualmente no se soportan los siguientes elementos:</p>
+		<p align="justify">- Captcha.</p>
+		<p align="justify">- Elección multiple (clasificadas).</p>
+		<p align="justify">- Información.</p>
+		<p align="justify">- Salto de página.</p>
+		<h1>Ejemplos de uso</h1>
+		<p align="justify">Concretar la fecha de un examen, realizar un concurso de preguntas y respuestas en clase, resolver conflictos puntuales con una votación anónima, 
+			valorar la clase impartida por el profesor, aportar preguntas o sugerencias por los asistentes de una conferencia multitudinaria...</p>
+		<a href="#" data-role="button" data-rel="back">Volver a la Aplicación</a>
+	</div>
+
+</div>
+
+<script>
+
+// --- Datos Globales ---
+var URL = "";
+var username = "";
+var mytoken = 0;
+var login_state = false;
+/*The service shortname is usually hardcoded in the pre-build service (db/service.php files) or
+ you can add it manually in the DB.*/
+var WS_short_name = 'wsfbplugin'; 
+
+
+// Log In Button (Boton Iniciar Sesion)
+$('#formulario').submit(function() {
+
+	// Ejecutamos la función por si hubiera que guardar datos
+	recordar();
+
+	// Realizamos login y obtenemos el token del usuario
+	login();
+	
+	// Cargamos la pagina principal
+	if(login_state){
+		cargarHome();
+	}
+	
+	return false;
+});
+
+</script>
+	
+</body>
+</html>
+
