@@ -1,6 +1,6 @@
 /*
-	© Universidad de Granada. Granada – 2014
-	© Rosana Montes Soldado y Alejandro Molina Salazar (amolinasalazar@gmail.com). Granada – 2014
+	ï¿½ Universidad de Granada. Granada ï¿½ 2014
+	ï¿½ Rosana Montes Soldado y Alejandro Molina Salazar (amolinasalazar@gmail.com). Granada ï¿½ 2014
 
     This program is free software: you can redistribute it and/or 
     modify it under the terms of the GNU General Public License as 
@@ -42,6 +42,9 @@ function recordar(){
  */
 function cargarDatos(){
 	
+	// Cargamos imagen con la ruta del fichero configuration.js
+	$("#login_img").attr("src",login_img);
+	
 	// Recuperamos los datos a traves del localStorage
 	var urlsitio = window.localStorage.getItem("urlsitio");	
    	var u = window.localStorage.getItem("username");
@@ -64,6 +67,46 @@ function cargarDatos(){
  * functions and will load the content of the home page.
  */
 function cargarHome(){
+	
+	//INSERCCION SEPUG
+	/*moodleWSCall("mod_sepug_get_not_submitted_enrolled_courses_as_student", {}, function(data_user){
+		dump(data_user);
+	});*/
+	/*moodleWSCall("mod_sepug_get_sepug_instance", {}, function(data_user){
+		dump(data_user);
+	});*/
+	/*moodleWSCall("mod_sepug_get_survey_questions", {courseid: 4}, function(data_user){
+		dump(data_user);
+	});*/
+	/*var valores = [];
+	valores.push({questionid: 1, time: 1429982474, answer: 1});
+	valores.push({questionid: 2, time: 1429982474, answer: 1});
+	valores.push({questionid: 3, time: 1429982474, answer: 1});
+	valores.push({questionid: 4, time: 1429982474, answer: 1});
+	valores.push({questionid: 5, time: 1429982474, answer: 1});
+	valores.push({questionid: 6, time: 1429982474, answer: 1});
+	valores.push({questionid: 7, time: 1429982474, answer: 1});
+	valores.push({questionid: 8, time: 1429982474, answer: 1});
+	valores.push({questionid: 9, time: 1429982474, answer: 1});
+	valores.push({questionid: 10, time: 1429982474, answer: 1});
+	valores.push({questionid: 11, time: 1429982474, answer: 1});
+	valores.push({questionid: 12, time: 1429982474, answer: 1});
+	valores.push({questionid: 13, time: 1429982474, answer: 1});
+	valores.push({questionid: 14, time: 1429982474, answer: 1});
+	valores.push({questionid: 15, time: 1429982474, answer: 1});
+	valores.push({questionid: 16, time: 1429982474, answer: 1});
+	valores.push({questionid: 17, time: 1429982474, answer: 1});
+	valores.push({questionid: 18, time: 1429982474, answer: 1});
+	valores.push({questionid: 20, time: 1429982474, answer: 1});
+	valores.push({questionid: 21, time: 1429982474, answer: 1});
+	valores.push({questionid: 22, time: 1429982474, answer: 1});
+	valores.push({questionid: 23, time: 1429982474, answer: 1});
+	valores.push({questionid: 24, time: 1429982474, answer: 1});
+	valores.push({questionid: 25, time: 1429982474, answer: 1});
+	valores.push({questionid: 26, time: 1429982474, answer: 1});
+	moodleWSCall("mod_sepug_submit_survey", {courseid: 3, groupid: 0, itemvalues: valores}, function(data_user){
+		dump(data_user);
+	});*/
 	
 	// Loader
 	$.mobile.loading( "show", {
@@ -88,23 +131,24 @@ function cargarHome(){
 				if(user_courses[i].visible)
 					id_cursos[i+1] = user_courses[i].id;
 			}
-
+			
 			// Obtenemos informacion sobre las encuestas asociadas al usuario 
 			moodleWSCall("local_fbplugin_get_feedbacks_by_courses", {courseids: id_cursos}, function(feedbacks){
-				
-				// Eliminamos las posibles encuestas ya cargadas
-				$("#grupo_general").empty();
-				$("#grupo_cursos").empty();
-    		
-    			// Obtenemos la lista de IDs de los cursos actualizada solo con los cursos 
-    			// que tengan alguna encuesta 
-    			id_cursos = null;
+				moodleWSCall("mod_sepug_get_sepug_instance", {}, function(sepug_instance){
+					moodleWSCall("mod_sepug_get_not_submitted_enrolled_courses_as_student", {}, function(sepug_courses){
+
+				// Declaraciones
+				id_cursos = null;
 				id_cursos = [];
 				var nombres_cursos = [];
+				var nombre_sepug = "";
 				var fb_cursos = [];
 				var fb_generales = [];
 				var fb_curso = false;
+				var sepug_cursos = [];
 				
+    			// Obtenemos la lista de IDs de los cursos actualizada solo con los cursos 
+    			// que tengan alguna encuesta 
     			for(var i=0; i<feedbacks.length; i++){
     				// Es encuesta general
     				if(feedbacks[i].course == 1){
@@ -121,88 +165,150 @@ function cargarHome(){
 						fb_curso = false;
 					}
 				}				
-					
-				// Localizamos los elementos HTML de HOME
-				var grupo_general = document.getElementById("grupo_general");
-				var grupo_cursos = document.getElementById("grupo_cursos");
+        	
 				
-				// FB generales
-				if(fb_generales.length != 0){
+    			//-- SEPUG --//
+				if(sepug_instance!=null){
 					
-					for(var i=0; i<fb_generales.length; i++){
-						var a = document.createElement("a");
-						// Si no hacemos esto, devolvera un valor de i cualquiera
-						a.onclick = (function() {
-							var currentI = i;
-							return function() { 
-						    	cargarPaginaInfo(currentI, fb_generales);
-							}
-						})();
-						a.setAttribute('data-role', 'button');
-						a.setAttribute('data-icon', 'carat-r');
-						a.innerHTML = fb_generales[i].name;
-						grupo_general.appendChild(a);
+					// If is not close already
+					var current_time=new Date().getTime()/1000;
+					if(sepug_instance.timeopen > current_time || sepug_instance.timeclose < current_time || 
+							sepug_instance.timeclosestudents < current_time){
+						//cerrado
 					}
-				}
-				else{
-					var p = document.createElement("p");		
-					p.innerHTML = "En estos momentos, usted no dispone de ninguna encuesta general.";
-					p.setAttribute('align', 'justify');
-					var div = document.createElement("div");
-					div.setAttribute('data-role', 'content');
-					div.appendChild(p);
-					grupo_general.appendChild(div);
-				}
-				
-				// FB cursos
-				if(fb_cursos.length != 0){
-					
-					for(var i=0; i<fb_cursos.length; i++){
-						// Intentamos buscar el contenedor del curso, por si lo hubieramos creado previamente
-						var div = document.getElementById(nombres_cursos[i]);
-						
-						// Si no hemos creado ya el contenedor del curso, lo creamos ahora
-						if(div==null){
-							div = document.createElement("div");
-							div.setAttribute('data-role', 'collapsible');
-							div.setAttribute('id', nombres_cursos[i]);
-							div.innerHTML = "<h3>" + nombres_cursos[i] + "</h3>";
+					else{
+						nombre_sepug = sepug_instance.name;
+						for(var i=0; i<sepug_courses.length; i++){
+							
+							sepug_cursos.push(sepug_courses[i]);
+
 						}
-						
-						// Añadimos el boton de la encuesta
-						var a = document.createElement("a");
-						// Si no hacemos esto, devolvera un valor de i cualquiera
-						a.onclick = (function() {
-							var currentI = i;
-							return function() { 
-						    	cargarPaginaInfo(currentI, fb_cursos);
-							}
-						})();
-						a.setAttribute('data-role', 'button');
-						a.setAttribute('data-icon', 'carat-r');
-						a.innerHTML = fb_cursos[i].name;
-						div.appendChild(a);
-						grupo_cursos.appendChild(div);
-				
-					}
+					}	
 				}
-				else{
-					var p = document.createElement("p");		
-					p.innerHTML = "En estos momentos, usted no dispone de ninguna encuesta asociada a algun curso.";
-					p.setAttribute('align', 'justify');
-					var div = document.createElement("div");
-					div.setAttribute('data-role', 'content');
-					div.appendChild(p);
+			
+			
+			
+			// Eliminamos las posibles encuestas ya cargadas
+			$("#grupo_general").empty();
+			$("#grupo_cursos").empty();
+			
+			// Localizamos los elementos HTML de HOME
+			var grupo_general = document.getElementById("grupo_general");
+			var grupo_cursos = document.getElementById("grupo_cursos");
+			
+			// FB generales
+			if(fb_generales.length != 0){
+				
+				for(var i=0; i<fb_generales.length; i++){
+					var a = document.createElement("a");
+					// Si no hacemos esto, devolvera un valor de i cualquiera
+					a.onclick = (function() {
+						var currentI = i;
+						return function() { 
+					    	cargarPaginaInfo(currentI, fb_generales);
+						}
+					})();
+					a.setAttribute('data-role', 'button');
+					a.setAttribute('data-icon', 'carat-r');
+					a.innerHTML = fb_generales[i].name;
+					grupo_general.appendChild(a);
+				}
+			}
+			else{
+				var p = document.createElement("p");		
+				p.innerHTML = "En estos momentos, usted no dispone de ninguna encuesta general.";
+				p.setAttribute('align', 'justify');
+				var div = document.createElement("div");
+				div.setAttribute('data-role', 'content');
+				div.appendChild(p);
+				grupo_general.appendChild(div);
+			}
+			
+			// FB cursos
+			if(fb_cursos.length != 0){
+				
+				for(var i=0; i<fb_cursos.length; i++){
+					// Intentamos buscar el contenedor del curso, por si lo hubieramos creado previamente
+					var div = document.getElementById(nombres_cursos[i]);
+					
+					// Si no hemos creado ya el contenedor del curso, lo creamos ahora
+					if(div==null){
+						div = document.createElement("div");
+						div.setAttribute('data-role', 'collapsible');
+						div.setAttribute('id', nombres_cursos[i]);
+						div.innerHTML = "<h3>" + nombres_cursos[i] + "</h3>";
+					}
+					
+					// Aï¿½adimos el boton de la encuesta
+					var a = document.createElement("a");
+					// Si no hacemos esto, devolvera un valor de i cualquiera
+					a.onclick = (function() {
+						var currentI = i;
+						return function() { 
+					    	cargarPaginaInfo(currentI, fb_cursos);
+						}
+					})();
+					a.setAttribute('data-role', 'button');
+					a.setAttribute('data-icon', 'carat-r');
+					a.innerHTML = fb_cursos[i].name;
+					div.appendChild(a);
+					grupo_cursos.appendChild(div);
+			
+				}
+			}
+			if(sepug_cursos.length != 0){
+				for(var i=0; i<sepug_cursos.length; i++){
+					
+					// Intentamos buscar el contenedor del curso, por si lo hubieramos creado previamente
+					var div = document.getElementById(sepug_cursos[i].fullname);
+					
+					// Si no hemos creado ya el contenedor del curso, lo creamos ahora
+					if(div==null){
+						div = document.createElement("div");
+						div.setAttribute('data-role', 'collapsible');
+						div.setAttribute('id', sepug_cursos[i].fullname);
+						div.innerHTML = "<h3>" + sepug_cursos[i].fullname + "</h3>";
+					}
+					
+					// Aï¿½adimos el boton de la encuesta
+					var a = document.createElement("a");
+					// Si no hacemos esto, devolvera un valor de i cualquiera
+					a.onclick = (function() {
+						var currentI = i;
+						return function() { 
+							cargarPaginaInfoSepug(currentI, sepug_cursos, sepug_instance);
+						}
+					})();
+					a.setAttribute('data-role', 'button');
+					a.setAttribute('data-icon', 'carat-r');
+					if(sepug_courses[i].groupid == 0){
+						a.innerHTML = nombre_sepug;
+					}
+					else{
+						a.innerHTML = nombre_sepug+" - Grupo: "+sepug_courses[i].groupname;
+					}
+					div.appendChild(a);
 					grupo_cursos.appendChild(div);
 				}
+			}
+			if(fb_generales.length == 0 && sepug_cursos.length == 0){
+				var p = document.createElement("p");		
+				p.innerHTML = "En estos momentos, usted no dispone de ninguna encuesta asociada a algun curso.";
+				p.setAttribute('align', 'justify');
+				var div = document.createElement("div");
+				div.setAttribute('data-role', 'content');
+				div.appendChild(p);
+				grupo_cursos.appendChild(div);
+			}
+			
 
-    			// Cambiamos la pagina a "home"
-    			$("#home").trigger("create");
-    			$("#panel").trigger( "updatelayout" );
-            	$.mobile.changePage("#home",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
-            	$.mobile.loading("hide");
-            	
-        	});	
+			// Cambiamos la pagina a "home"
+			$("#home").trigger("create");
+			$("#panel").trigger( "updatelayout" );
+        	$.mobile.changePage("#home",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
+        	$.mobile.loading("hide");
+        	
+			});});});
 		});
 	});
 }
@@ -229,7 +335,7 @@ function cargarPaginaInfo(id_btn, fb){
 	// Limpiamos la pantalla antes de comenzar
 	$("#info").empty();
 	
-	// Creamos los elementos de la pagina de información general de la encuesta
+	// Creamos los elementos de la pagina de informaciï¿½n general de la encuesta
 	var info = document.getElementById("info");
 	
 	// TITULO Y DESCRIPCION
@@ -243,18 +349,18 @@ function cargarPaginaInfo(id_btn, fb){
 	
 	// ANONYMOUS
 	if(fb[id_btn].anonymous==1){
-		//info.innerHTML += "<dl><dt>Anónima: </dt><dd>Sí</dd>";
-		table.innerHTML += "<tbody><tr><td>Anónima</td><th>Sí</th></tr>";
+		//info.innerHTML += "<dl><dt>Anï¿½nima: </dt><dd>Sï¿½</dd>";
+		table.innerHTML += "<tbody><tr><td>Anï¿½nima</td><th>Sï¿½</th></tr>";
 	}
 	else{
-		//info.innerHTML += "<dl><dt>Anónima: </dt><dd>No</dd>";
-		table.innerHTML += "<tbody><tr><td>Anónima</td><th>No</th></tr>";
+		//info.innerHTML += "<dl><dt>Anï¿½nima: </dt><dd>No</dd>";
+		table.innerHTML += "<tbody><tr><td>Anï¿½nima</td><th>No</th></tr>";
 	}
 		
 	// MULTIANSWER
 	if(fb[id_btn].multiple_submit==1){
-		//info.innerHTML += "<dt>Multi-respuesta: </dt><dd>Sí</dd>";
-		table.innerHTML += "<tr><td>Multi-respuesta</td><th>Sí</th></tr>";
+		//info.innerHTML += "<dt>Multi-respuesta: </dt><dd>Sï¿½</dd>";
+		table.innerHTML += "<tr><td>Multi-respuesta</td><th>Sï¿½</th></tr>";
 	}
 	else{
 		//info.innerHTML += "<dt>Multi-respuesta: </dt><dd>No</dd>";
@@ -273,12 +379,12 @@ function cargarPaginaInfo(id_btn, fb){
 		
 		// Solo tiene fecha de cierre y esta cerrado
 		if(fb[id_btn].timeopen == 0){
-			info.innerHTML += "<h4><code>La encuesta se cerró el día "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
+			info.innerHTML += "<h4><code>La encuesta se cerrï¿½ el dï¿½a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
 			" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
 		}
 		// Solo tiene fecha de apertura y esta cerrado
 		if(fb[id_btn].timeclose == 0){
-			info.innerHTML += "<h4><code>La encuesta se abrirá el día "+date_open.getDate()+"/"+(+date_open.getMonth()+1)+"/"+date_open.getFullYear()+
+			info.innerHTML += "<h4><code>La encuesta se abrirï¿½ el dï¿½a "+date_open.getDate()+"/"+(+date_open.getMonth()+1)+"/"+date_open.getFullYear()+
 			" a las "+date_open.getHours()+":"+date_open.getMinutes()+" horas.</code></h4><p></p>";
 		}
 		// Tiene fecha de apertura y cierre y esta cerrado
@@ -297,7 +403,7 @@ function cargarPaginaInfo(id_btn, fb){
 		// Si tiene una fecha de cierre, avisamos
 		if(fb[id_btn].timeclose != 0){
 			var date_close = new Date(fb[id_btn].timeclose*1000);
-			info.innerHTML += "<h4><code>La encuesta se cerrará el día "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
+			info.innerHTML += "<h4><code>La encuesta se cerrarï¿½ el dï¿½a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
 			" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
 		}
 		
@@ -316,7 +422,81 @@ function cargarPaginaInfo(id_btn, fb){
 		info.appendChild(a);
 	}
 	
-	// Vuelve a recrear los estilos, cambia de página y oculta el loader
+	// Vuelve a recrear los estilos, cambia de pï¿½gina y oculta el loader
+	$("#info-fb").trigger("create");
+	$.mobile.changePage("#info-fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"slide"});
+	$.mobile.loading("hide");
+}
+
+/**
+ * Using the content obtained before in the "cargarHome()" function, it 
+ * charges the information page of the feedback selected and "info-fb" pass to 
+ * be the active page.
+ * 
+ * @param {int} id_btn The index to navigate on the "fb" object and access 
+ *  to the selected feedback data.
+ * @param {Object} fb Contains all the data related with the user feedbacks.
+ */
+function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
+	
+	// Mostramos loader
+	$.mobile.loading( "show", {
+	  text: "Cargando...",
+	  textVisible: true,
+	  theme: "b",
+	  html: ""
+	});
+	
+	// Limpiamos la pantalla antes de comenzar
+	$("#info").empty();
+	
+	// Creamos los elementos de la pagina de informaciï¿½n general de la encuesta
+	var info = document.getElementById("info");
+	
+	// TITULO Y DESCRIPCION
+	info.innerHTML = "<h2>"+sepug_instance.name+"</h2><h3>SEPUG: Sistema de EvaluaciÃ³n del Profesorado de la Universidad de Granada, " +
+			"es una herramienta de control de calidad y evaluaciÃ³n del profesorado, para la valoraciÃ³n de las tareas docentes " +
+			"por parte del alumnado en las titulaciones de grado o posgrado. Los estudiantes a travÃ©s de la cumplimentaciÃ³n ANÃ“NIMA " +
+			"de un BREVE cuestionario, pueden valorar a los profesores de las asignaturas que cursan.</h3>";
+	
+	// TABLE
+	var table = document.createElement("table");
+	table.setAttribute('class', 'ui-responsive table-stroke');
+	table.setAttribute('data-model', 'columntoggle');
+	table.innerHTML = "<thead><tr><td>                        </td><td>                 </td></tr></thead>";
+	
+	// ANONYMOUS
+	table.innerHTML += "<tbody><tr><td>Anï¿½nima</td><th>SÃ­</th></tr>";
+		
+	// MULTIANSWER
+	table.innerHTML += "<tr><td>Multi-respuesta</td><th>No</th></tr>";
+	
+	// ENCUESTA ABIERTA
+	table.innerHTML += "<tr><td>Plazo</td><th>Abierto</th></tr></tbody><p></p>";
+	info.appendChild(table);
+	
+	// Si tiene una fecha de cierre, avisamos
+	if(sepug_instance.timeclosestudents != 0){
+		var date_close = new Date(sepug_instance.timeclosestudents*1000);
+		info.innerHTML += "<h4><code>La encuesta se cerrarï¿½ el dï¿½a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
+		" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
+	}
+	
+	// Boton comenzar encuesta
+	var a = document.createElement("a");
+	a.onclick = (function() {
+		var currentId = id_btn;
+		return function() { 
+			cargarSEPUG(currentId, sepug_cursos);
+		}
+	})();
+	a.setAttribute('data-role', 'button');
+	a.setAttribute('data-icon', 'carat-r');
+	var texto = document.createTextNode("Comenzar Encuesta");
+	a.appendChild(texto);
+	info.appendChild(a);
+	
+	// Vuelve a recrear los estilos, cambia de pï¿½gina y oculta el loader
 	$("#info-fb").trigger("create");
 	$.mobile.changePage("#info-fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"slide"});
 	$.mobile.loading("hide");
@@ -389,7 +569,7 @@ function cargarFB(id_btn, fb){
 					// Creamos el label (pregunta)
 					var label = document.createElement("label");
 					label.setAttribute('for', 'p'+i);
-					label.innerHTML = fb_questions[i].name+" (caracteres máx.: "+maxcarac[1]+")";
+					label.innerHTML = fb_questions[i].name+" (caracteres mï¿½x.: "+maxcarac[1]+")";
 					if(required)
 						label.innerHTML += "*";
 					
@@ -405,7 +585,7 @@ function cargarFB(id_btn, fb){
 					
 				}
 				
-				// TEXTO LARGO - filas*columnas (nosotros le damos un tamaño estandar)
+				// TEXTO LARGO - filas*columnas (nosotros le damos un tamaï¿½o estandar)
 				if(fb_questions[i].typ == "textarea"){
 					
 					contestable = true;
@@ -491,7 +671,7 @@ function cargarFB(id_btn, fb){
 					// Options:
 					// i: No analiza los envios vacios (NO CONTEMPLADO)
 					// h: la opcion "No Seleccionada" oculto (SOLO FUNCIONA EN MOODLE CON RADIO BUTTON, ASI QUE
-					//	EVITAREMOS AÑADIR LA RESPUESTA EN LOS OTROS DOS TIPOS)
+					//	EVITAREMOS Aï¿½ADIR LA RESPUESTA EN LOS OTROS DOS TIPOS)
 					
 					// Eliminamos la cabecera del presentation (y la cola si la hubiera) 
 					var respuestas_juntas = fb_questions[i].presentation.substring(6, fb_questions[i].presentation.length);
@@ -512,7 +692,7 @@ function cargarFB(id_btn, fb){
 						if(fb_questions[i].presentation.charAt(0) == 'r'){
 							var tipo_multi = "radio";
 							//OPCIONES (SOLO EN RADIO BUTTON)
-							// Contemplamos si "No Seleccionada" esta activo y añadimos la opción
+							// Contemplamos si "No Seleccionada" esta activo y aï¿½adimos la opciï¿½n
 							if(fb_questions[i].options.match(/h/g) == null){
 								respuestas.splice(0,0,"No Seleccionada");
 							}
@@ -553,7 +733,7 @@ function cargarFB(id_btn, fb){
 					}else{
 						// SELECT (lista desplegable)
 						
-						// Se añade por defecto un hueco en blanco al principio 
+						// Se aï¿½ade por defecto un hueco en blanco al principio 
 						// para contemplar la no contestacion de la pregunta
 						respuestas.splice(0,0,"");
 	
@@ -568,7 +748,6 @@ function cargarFB(id_btn, fb){
 						// Creamos el select
 						var select = document.createElement("select");
 						select.setAttribute('id', 'p'+i);
-						select.setAttribute('data-native-menu', 'false');
 					
 						// Cada respuesta:
 						for(var j=0; j<respuestas.length ; j++){	
@@ -617,7 +796,7 @@ function cargarFB(id_btn, fb){
 				fb_content.appendChild(div);
 				
 				var p = document.createElement("p");		
-				p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todavía.";
+				p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todavï¿½a.";
 				div.appendChild(p);
 				fb_content.appendChild(div);
 				
@@ -641,7 +820,7 @@ function cargarFB(id_btn, fb){
 			fb_content.appendChild(div);
 			
 			var p = document.createElement("p");		
-			p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todavía.";
+			p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todavï¿½a.";
 			div.appendChild(p);
 			fb_content.appendChild(div);
 			
@@ -654,7 +833,147 @@ function cargarFB(id_btn, fb){
 			fb_content.appendChild(a);
 		}
 		
-		// Vuelve a recrear los estilos, cambia de página y oculta el loader
+		// Vuelve a recrear los estilos, cambia de pï¿½gina y oculta el loader
+		$("#fb").trigger("create");
+		$.mobile.changePage("#fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
+		$( ".selector" ).loader( "hide" );
+	});	
+}
+
+/**
+ * Using the same content obtained before in the "cargarHome()" function and 
+ * more extra data about the questions of the feedback calling "get_feedback_questions" 
+ * Web Service function, it generates a feedback and changes the active page by "fb".
+ * 
+ * @param {int} id_btn The index to navigate on the "fb" object and access 
+ *  to the selected feedback data.
+ * @param {Object} fb Contains all the data related with the user feedbacks.
+ */
+function cargarSEPUG(id_btn, sepug_cursos){
+	
+	$.mobile.loading( "show", {
+	  text: "Generando encuesta...",
+	  textVisible: true,
+	  theme: "b",
+	  html: ""
+	});
+	
+	// Borramos los elementos para volver a generarlos
+	$("#fb_content").empty();
+	$("#btn_fb_cancelar").empty();
+	$("#btn_fb_enviar").empty();
+	
+	// Cargar preguntas
+	moodleWSCall("mod_sepug_get_survey_questions", {courseid: sepug_cursos[id_btn].id}, function(sepug_questions){
+
+		// Si hay alguna pregunta que contestar..
+		if(sepug_questions.length!=0){
+			
+			//var contestable = false;
+			var respuestas = [];
+			var fb_content = document.getElementById("fb_content");
+			
+			// Creamos los elementos del FB
+			for(var i=0; i<sepug_questions.length; i++){
+				
+				var div = document.createElement("div");
+				div.setAttribute('class','ui-body');
+				fb_content.appendChild(div);
+				
+				// Guardamos cada posible respuesta en un vector
+				respuestas = null;
+				respuestas = sepug_questions[i].options.split(",");
+				
+				// Solo hay dos tipos: tipo 1 radio y tipo 2 select
+				
+				// MULTICHOICE - radio
+				if(sepug_questions[i].type == 1){
+
+					// Creamos el fieldset
+					var fieldset = document.createElement("fieldset");
+					fieldset.setAttribute('data-role', 'controlgroup');
+					//fieldset.setAttribute('data-type', 'horizontal');
+					
+					// Creamos legend (enunciado pregunta)
+					var legend = document.createElement("legend");
+					legend.innerHTML = sepug_questions[i].text;
+					legend.innerHTML += "*";
+					
+					// Cada respuesta:
+					for(var j=0; j<respuestas.length ; j++){	
+						var input = document.createElement("input");
+						input.setAttribute('type', 'radio');
+						input.setAttribute('name', 'p'+i);
+						input.setAttribute('id', 'p'+i+'r'+j); // numero pregunta y respuesta
+						input.setAttribute('value', j);
+						var label = document.createElement("label");
+						label.setAttribute('for', 'p'+i+'r'+j);
+						label.innerHTML = respuestas[j];
+						legend.appendChild(label);	
+						legend.appendChild(input);			
+					}
+					
+					fieldset.appendChild(legend);
+					div.appendChild(fieldset);
+					fb_content.appendChild(div);
+				} // end if
+				
+				// MULTICHOICE - select
+				if(sepug_questions[i].type == 2){
+				
+					// Se aï¿½ade por defecto un hueco en blanco al principio 
+					// para contemplar la no contestacion de la pregunta
+					respuestas.splice(0,0,"");
+	
+					// Creamos el label general
+					var label = document.createElement("label");
+					label.setAttribute('for', 'p'+i+'r'+j);
+					label.setAttribute('class', 'select');
+					label.innerHTML = sepug_questions[i].text;
+					label.innerHTML += "*";
+					
+					// Creamos el select
+					var select = document.createElement("select");
+					select.setAttribute('id', 'p'+i);
+				
+					// Cada respuesta:
+					for(var j=0; j<respuestas.length ; j++){	
+						var option = document.createElement("option");
+						option.setAttribute('value', j);
+						option.innerHTML = respuestas[j];
+						select.appendChild(option);
+					}
+					
+					div.appendChild(label);
+					div.appendChild(select);
+					fb_content.appendChild(div);
+				}
+				
+				
+			} // end for
+			
+			var btn_fb_enviar = document.getElementById("btn_fb_enviar");
+			var btn_fb_cancelar = document.getElementById("btn_fb_cancelar");
+			
+			// Boton Cancelar
+			var a = document.createElement("a");
+			a.setAttribute('data-role', 'button');
+			a.setAttribute('data-rel', 'back');
+			a.setAttribute('data-icon', 'delete');
+			a.innerHTML = "Cancelar";
+			btn_fb_cancelar.appendChild(a);
+			
+			// Boton Enviar
+			var a = document.createElement("a");
+			a.setAttribute('data-role', 'button');
+			a.setAttribute('data-icon', 'check');
+			a.onclick = function(){enviarSEPUG(sepug_questions, sepug_cursos[id_btn]);};
+			a.innerHTML = "Enviar";
+			btn_fb_enviar.appendChild(a);
+	
+		}// end if
+		
+		// Vuelve a recrear los estilos, cambia de pï¿½gina y oculta el loader
 		$("#fb").trigger("create");
 		$.mobile.changePage("#fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
 		$( ".selector" ).loader( "hide" );
@@ -675,7 +994,7 @@ function enviarFB(fb_questions, fb_id){
 	// MULTICHOICE:
 	// RADIO BUTTON(cambia, sumar 1 a los ids o dejar como esta) -> opciones con id[1..N], no seleccionada como primera opcion con id=0, ej: 2
 	// CHECK BOX(sumar 1 a los ids) -> opciones con id[1..N], no funciona no seleccionada (simplemente no marcar ninguna), ej: 2|3 
-	// SELECT(bien) -> se añade un hueco en blanco como primera opcion con id=0, no funciona no seleccionada (hueco en blanco), ej: 1 
+	// SELECT(bien) -> se aï¿½ade un hueco en blanco como primera opcion con id=0, no funciona no seleccionada (hueco en blanco), ej: 1 
 	
 	// Creamos el object a enviar a la BD
 	var valores = [];
@@ -761,6 +1080,66 @@ function enviarFB(fb_questions, fb_id){
 }
 
 /**
+ * Using the questions data obtained in "cargarFB(id_btn, fb)" function, it will process
+ * the completed feedback by the user and will send the results to register them in 
+ * the Moodle data base by calling "complete_feedback" Web Service function.
+ * 
+ * @param {Object} fb_questions Contains all the questions data about the completed feedback.
+ * @param {int} fb_id The moodle index of the completed feedback.
+ */
+function enviarSEPUG(sepug_questions, sepug_course){ 
+	
+	// Creamos el object a enviar a la BD
+	var valores = [];
+	var value;
+	var salir = false;
+	
+	var current_time=new Date().getTime()/1000;
+	
+	for(var i=0; i<sepug_questions.length && salir != true; i++){
+		
+		value = null;
+		
+		// Si es alguno de los tipos contemplados y contestables..
+		if(sepug_questions[i].type == 1){
+			
+			if($('input[name=p'+i+']:checked', '#FBform').val()==undefined){
+				alert("Error: compruebe si ha respondido todas las preguntas obligatorias.");
+				salir = true;
+			}
+			else{
+				value = +$('input[name=p'+i+']:checked', '#FBform').val()+1;
+			}			
+		}
+		
+		else if(sepug_questions[i].type == 2){
+			
+			// Tanto no haber seleccionado nada, como tener marcada la primera opcion que esta en blanco..
+			if(($("#p"+i).val()==0 || $("#p"+i).val()=="")){
+				alert("Error: compruebe si ha respondido a todas las preguntas obligatorias.");
+				salir = true;
+			}
+			else{
+				value = +$("#p"+i).val();
+			}
+		}
+
+		valores.push({questionid: sepug_questions[i].id, time: parseInt(current_time), answer: value});
+	}
+	
+	// Si todo ha ido bien, procedemos a realizar el envio
+	if(salir == false){
+		
+		moodleWSCall("mod_sepug_submit_survey", {courseid: sepug_course.id, groupid: sepug_course.groupid, itemvalues: valores}, function(result){		
+            
+            alert("Encuesta registrada satisfactoriamente.");
+            $.mobile.back();
+            
+    	});
+	}
+}
+
+/**
  * A moodle WebService call to login.
  */
 function login(){
@@ -802,7 +1181,7 @@ function login(){
             login_state = true;
             
 		}else {
-            var error = "compruebe su usuario y contraseña.";
+            var error = "compruebe su usuario y contraseï¿½a.";
 
             if (typeof(respuesta.error) != 'undefined') {
                 error = respuesta.error;
@@ -815,9 +1194,9 @@ function login(){
     },
         
     error:function(xhr, textStatus, errorThrown) {
-        var error = "no es posible la conexión, compruebe si dispone de acceso a internet.";
+        var error = "no es posible la conexiï¿½n, compruebe si dispone de acceso a internet.";
         if (xhr.status == 404) {
-        	error = "no es posible conectar con el servidor, intentelo de nuevo más tarde.";
+        	error = "no es posible conectar con el servidor, intentelo de nuevo mï¿½s tarde.";
         }
         
         alert("Problema de red: "+error);
@@ -859,7 +1238,7 @@ function moodleWSCall(method, json, callback) {
 	            if (typeof(data.exception) != 'undefined') {
 	                if (data.errorcode == "invalidtoken" || data.errorcode == "accessexception") {
 	                    // Conexion perdida
-	                    alert('Error: vuelva a iniciar sesión en la aplicación.');
+	                    alert('Error: vuelva a iniciar sesiï¿½n en la aplicaciï¿½n.');
 	                    $.mobile.changePage("#inicio");
 	                    $.mobile.loading("hide");
 	                    return;
@@ -891,15 +1270,20 @@ function moodleWSCall(method, json, callback) {
         
         error: function(xhr, ajaxOptions, thrownError) {
 
-            var error = "no es posible la conexión, compruebe si dispone de acceso a internet.";
-            if (xhr.status == 404) {
-                error = "no es posible conectar con el servidor, intentelo de nuevo más tarde.";
-            }
+            //var error = "no es posible la conexiï¿½n, compruebe si dispone de acceso a internet.";
+            //if (xhr.status == 404) {
+            //    error = "no es posible conectar con el servidor, intentelo de nuevo mï¿½s tarde.";
+            //}
+            dump(xhr);
+            dump(ajaxOptions);
+            dump(thrownError);
+            
+            alert("Error "+xhr.status+": "+thrownError);
             
             // Error para desarrollador
             //alert('WS: error on ' + method + ' error: ' + error);
             
-            alert("Problema de red: "+error);
+            //alert("Problema de red: "+error);
             
             $.mobile.loading("hide");
     	}

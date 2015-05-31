@@ -27,10 +27,15 @@
 	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
     <script src="js/jquery-1.11.0.min.js"></script>
     <script src="js/jquery.mobile-1.4.3.min.js"></script>
-    <script src="cordova.js"></script>
+    <script src="cordova-1.9.0.js"></script>
     <script src="js/functions.js"></script>
+    <script src="js/configuration.js"></script>
 
-</head>
+	<!-- CDN Respositories: For production, replace lines above with these uncommented minified versions -->
+	<!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />-->
+	<!-- <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>-->
+	<!-- <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>-->
+	</head>
  
 <body onLoad="cargarDatos()">
 
@@ -44,6 +49,10 @@
     </div>
  
  	<!-- CONTENIDO -->
+ 	<div class="ui-body ui-body-b" style="margin-top: 5px; text-align:center">
+ 		<label>Toca el icono para acceder a traves de:</label>
+		<a onclick = "$('#urlsitio').val(login_URL);"><img id="login_img" src="img" style="max-width:100%;"/></a>
+	</div>
  	<div data-role="content">
 		<form id="formulario">
 			<label>URL Sitio Moodle</label>
@@ -142,8 +151,8 @@
 	
 	<div data-role="content">
 		
-		<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de apoyar a las nuevas tecnologías y
-		añadir una nueva herramienta a la comunidad universitaria.</p>
+		<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de facilitar a la comunidad universitaria el 
+			intercambio de información profesor-alumno a través de las nuevas tecnologías.</p>
 		<p align="justify">Su objetivo es mejorar, flexibilizar y automatizar el uso de encuestas para permitir la recogida de opiniones, 
 		votaciones populares, resolución de problemas o la toma de decisiones.</p>
 		
@@ -208,11 +217,11 @@
 
 	<div data-role="content">
 		<h1>¿Qué es OpinaUGR?</h1>
-		<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de apoyar a las nuevas tecnologías y
-		añadir una nueva herramienta a la comunidad universitaria. Su objetivo es mejorar, flexibilizar y automatizar
+		<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de facilitar a la comunidad universitaria el 
+		intercambio de información profesor-alumno a través de las nuevas tecnologías. Su objetivo es mejorar, flexibilizar y automatizar
 		el uso de encuestas para permitir la recogida de opiniones, votaciones populares, resolución de problemas o la toma de decisiones.</p>
 		<h1>¿Cómo funciona OpinaUGR?</h1>
-		<p align="justify">OpinaUGR se sincroniza con tu perfil de Moodle (en el caso de la UGR, PRADO2) y descarga todas las encuestas que se asocien a tu perfil.
+		<p align="justify">OpinaUGR se sincroniza con tu perfil de Moodle y descarga todas las encuestas que se asocien a tu perfil.
 		Al elegir una encuesta determinada, obtendremos una breve descripción de la misma que nos aportará algunos datos útiles como de si se trata 
 		de una encuesta de respuesta anónima o de si nos encontramos en el plazo adecuado para poder cumplimentarla. Si elegimos la opción de "Comenzar Encuesta", 
 		la app generará la encuesta para poder rellenarla y enviarla.</p>
@@ -229,7 +238,8 @@
 		<h1>¿A quién va dirigido OpinaUGR?</h1>
 		<p align="justify">A cualquier usuario de Moodle, tanto estudiantes como profesorado.</p>
 		<h1>¿Que tipo de elementos están soportados por la aplicación?</h1>
-		<p align="justify">La mayoría de los elementos clave para la creación encuestas estan soportados por la app, entre los que se encuentran:</p>
+		<p align="justify">OpinaUGR descarga las encuestas que son creadas a través del MODULO FEEDBACK y del MODULO SEPUG de Moodle. La mayoría de los elementos clave para la creación encuestas 
+			estan soportados por la app, entre los que se encuentran:</p>
 		<p align="justify">- Etiqueta (label).</p>
 		<p align="justify">- Respuesta de texto corta (textfield).</p>
 		<p align="justify">- Respuestas de texto largas (textarea).</p>
@@ -251,14 +261,12 @@
 
 <script>
 
-// --- Datos Globales ---
+// --- Global Data ---
 var URL = "";
 var username = "";
 var mytoken = 0;
 var login_state = false;
-/*The service shortname is usually hardcoded in the pre-build service (db/service.php files) or
- you can add it manually in the DB.*/
-var WS_short_name = 'wsfbplugin'; 
+
 
 document.addEventListener("deviceready", function(e) {
 	window.setTimeout(function() {
