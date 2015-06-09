@@ -1,6 +1,6 @@
 /*
-	� Universidad de Granada. Granada � 2014
-	� Rosana Montes Soldado y Alejandro Molina Salazar (amolinasalazar@gmail.com). Granada � 2014
+	@ Universidad de Granada. Granada @ 2014
+	@ Rosana Montes Soldado y Alejandro Molina Salazar (amolinasalazar@gmail.com). Granada @ 2014
 
     This program is free software: you can redistribute it and/or 
     modify it under the terms of the GNU General Public License as 
@@ -21,7 +21,7 @@
 function recordar(){
 	var c = $("#check");
 
-	// Si esta marcada la opcion de recordar, guardamos los datos
+	// If the box is checked, save the data
 	if(c.is(":checked")){
 		var urlsitio = $("#urlsitio").val();
 	    var u = $("#nombredeusuario").val();
@@ -38,21 +38,21 @@ function recordar(){
 
 /**
  * This funtion is called always at the beginning (body onLoad) and it will load 
- * the saved content in the local storage to the textboxes on the login page. 
+ * the saved content in the local storage to the text boxes on the login page. 
  */
 function cargarDatos(){
 	
-	// Cargamos imagen con la ruta del fichero configuration.js
+	// Load image using the path in js/configuration.js
 	$("#login_img").attr("src",login_img);
 	
-	// Recuperamos los datos a traves del localStorage
+	// Recovery login data from local storage
 	var urlsitio = window.localStorage.getItem("urlsitio");	
    	var u = window.localStorage.getItem("username");
    	var p = window.localStorage.getItem("password");
 
-	// Si se han introducido todos los datos previamente y se le dio a recordar
+	// If we have stored data and the remember box was checked
 	if(urlsitio!=null && u!=null && p!=null){
-		// Y completamos los textbox
+		// Fill the text box
 		$("#urlsitio").val(urlsitio);
 	   	$("#nombredeusuario").val(u); 
 	   	$("#clave").val(p);
@@ -68,46 +68,6 @@ function cargarDatos(){
  */
 function cargarHome(){
 	
-	//INSERCCION SEPUG
-	/*moodleWSCall("mod_sepug_get_not_submitted_enrolled_courses_as_student", {}, function(data_user){
-		dump(data_user);
-	});*/
-	/*moodleWSCall("mod_sepug_get_sepug_instance", {}, function(data_user){
-		dump(data_user);
-	});*/
-	/*moodleWSCall("mod_sepug_get_survey_questions", {courseid: 4}, function(data_user){
-		dump(data_user);
-	});*/
-	/*var valores = [];
-	valores.push({questionid: 1, time: 1429982474, answer: 1});
-	valores.push({questionid: 2, time: 1429982474, answer: 1});
-	valores.push({questionid: 3, time: 1429982474, answer: 1});
-	valores.push({questionid: 4, time: 1429982474, answer: 1});
-	valores.push({questionid: 5, time: 1429982474, answer: 1});
-	valores.push({questionid: 6, time: 1429982474, answer: 1});
-	valores.push({questionid: 7, time: 1429982474, answer: 1});
-	valores.push({questionid: 8, time: 1429982474, answer: 1});
-	valores.push({questionid: 9, time: 1429982474, answer: 1});
-	valores.push({questionid: 10, time: 1429982474, answer: 1});
-	valores.push({questionid: 11, time: 1429982474, answer: 1});
-	valores.push({questionid: 12, time: 1429982474, answer: 1});
-	valores.push({questionid: 13, time: 1429982474, answer: 1});
-	valores.push({questionid: 14, time: 1429982474, answer: 1});
-	valores.push({questionid: 15, time: 1429982474, answer: 1});
-	valores.push({questionid: 16, time: 1429982474, answer: 1});
-	valores.push({questionid: 17, time: 1429982474, answer: 1});
-	valores.push({questionid: 18, time: 1429982474, answer: 1});
-	valores.push({questionid: 20, time: 1429982474, answer: 1});
-	valores.push({questionid: 21, time: 1429982474, answer: 1});
-	valores.push({questionid: 22, time: 1429982474, answer: 1});
-	valores.push({questionid: 23, time: 1429982474, answer: 1});
-	valores.push({questionid: 24, time: 1429982474, answer: 1});
-	valores.push({questionid: 25, time: 1429982474, answer: 1});
-	valores.push({questionid: 26, time: 1429982474, answer: 1});
-	moodleWSCall("mod_sepug_submit_survey", {courseid: 3, groupid: 0, itemvalues: valores}, function(data_user){
-		dump(data_user);
-	});*/
-	
 	// Loader
 	$.mobile.loading( "show", {
 	  text: "Cargando...",
@@ -116,28 +76,28 @@ function cargarHome(){
 	  html: ""
 	});
 
-	// Obtenemos la informacion del usuario: cursos y sus encuestas asociadas
+	// Retrieve info of User: courses and enrolled feedbacks
 	moodleWSCall("core_webservice_get_site_info", {}, function(data_user){
 
-		// Nos devuelve la lista de cursos con la info justa (no incluye el curso ID=1 "general")
+		// Return the course list with some additional info(skip course ID=1)
 		moodleWSCall("core_enrol_get_users_courses", {userid: data_user.userid}, function(user_courses){
 			
-			// Creamos una lista de IDs de los cursos (incluyendo las encuestas generales del curso ID=1)
+			// Generate a ID list of the courses (now including general feedbacks of course ID=1)
 			id_cursos = null;
 			id_cursos = [];
 			id_cursos[0] = 1;
 			for(var i=0; i<user_courses.length; i++){
-				// Excluimos los cursos ocultos
+				// Skip hidden courses
 				if(user_courses[i].visible)
 					id_cursos[i+1] = user_courses[i].id;
 			}
 			
-			// Obtenemos informacion sobre las encuestas asociadas al usuario 
+			// Retrieve info about enrolled feedback of the user 
 			moodleWSCall("local_fbplugin_get_feedbacks_by_courses", {courseids: id_cursos}, function(feedbacks){
 				moodleWSCall("mod_sepug_get_sepug_instance", {}, function(sepug_instance){
 					moodleWSCall("mod_sepug_get_not_submitted_enrolled_courses_as_student", {}, function(sepug_courses){
-
-				// Declaraciones
+//var_dump(sepug_courses);
+				// Declarations
 				id_cursos = null;
 				id_cursos = [];
 				var nombres_cursos = [];
@@ -147,10 +107,9 @@ function cargarHome(){
 				var fb_curso = false;
 				var sepug_cursos = [];
 				
-    			// Obtenemos la lista de IDs de los cursos actualizada solo con los cursos 
-    			// que tengan alguna encuesta 
+				// Retrieve ID list of courses that they have at least one feedback				
     			for(var i=0; i<feedbacks.length; i++){
-    				// Es encuesta general
+    				// General feedback
     				if(feedbacks[i].course == 1){
     					fb_generales.push(feedbacks[i]);
     				}
@@ -172,11 +131,8 @@ function cargarHome(){
 					
 					// If is not close already
 					var current_time=new Date().getTime()/1000;
-					if(sepug_instance.timeopen > current_time || sepug_instance.timeclose < current_time || 
-							sepug_instance.timeclosestudents < current_time){
-						//cerrado
-					}
-					else{
+					if(!(sepug_instance.timeopen > current_time || sepug_instance.timeclose < current_time || 
+							sepug_instance.timeclosestudents < current_time)){
 						nombre_sepug = sepug_instance.name;
 						for(var i=0; i<sepug_courses.length; i++){
 							
@@ -186,22 +142,20 @@ function cargarHome(){
 					}	
 				}
 			
-			
-			
-			// Eliminamos las posibles encuestas ya cargadas
+			// Previus feedback cleaned
 			$("#grupo_general").empty();
 			$("#grupo_cursos").empty();
 			
-			// Localizamos los elementos HTML de HOME
+			// Locate DOM elements of HOME
 			var grupo_general = document.getElementById("grupo_general");
 			var grupo_cursos = document.getElementById("grupo_cursos");
 			
-			// FB generales
+			// General FB
 			if(fb_generales.length != 0){
 				
 				for(var i=0; i<fb_generales.length; i++){
 					var a = document.createElement("a");
-					// Si no hacemos esto, devolvera un valor de i cualquiera
+					// If we don't do this, it will return a random i value
 					a.onclick = (function() {
 						var currentI = i;
 						return function() { 
@@ -224,7 +178,7 @@ function cargarHome(){
 				grupo_general.appendChild(div);
 			}
 			
-			// FB cursos
+			// Courses FB
 			if(fb_cursos.length != 0){
 				
 				for(var i=0; i<fb_cursos.length; i++){
@@ -239,9 +193,9 @@ function cargarHome(){
 						div.innerHTML = "<h3>" + nombres_cursos[i] + "</h3>";
 					}
 					
-					// A�adimos el boton de la encuesta
+					// Add a feedback button
 					var a = document.createElement("a");
-					// Si no hacemos esto, devolvera un valor de i cualquiera
+					// If we don't do this, it will return a random i value
 					a.onclick = (function() {
 						var currentI = i;
 						return function() { 
@@ -259,10 +213,10 @@ function cargarHome(){
 			if(sepug_cursos.length != 0){
 				for(var i=0; i<sepug_cursos.length; i++){
 					
-					// Intentamos buscar el contenedor del curso, por si lo hubieramos creado previamente
+					// Search for previus DIV containers of the course
 					var div = document.getElementById(sepug_cursos[i].fullname);
 					
-					// Si no hemos creado ya el contenedor del curso, lo creamos ahora
+					// If the course doesn't have a DIV container, we create a new one
 					if(div==null){
 						div = document.createElement("div");
 						div.setAttribute('data-role', 'collapsible');
@@ -270,9 +224,9 @@ function cargarHome(){
 						div.innerHTML = "<h3>" + sepug_cursos[i].fullname + "</h3>";
 					}
 					
-					// A�adimos el boton de la encuesta
+					// Add a feedback button
 					var a = document.createElement("a");
-					// Si no hacemos esto, devolvera un valor de i cualquiera
+					// If we don't do this, it will return a random i value
 					a.onclick = (function() {
 						var currentI = i;
 						return function() { 
@@ -302,7 +256,7 @@ function cargarHome(){
 			}
 			
 
-			// Cambiamos la pagina a "home"
+			// Change the page to HOME
 			$("#home").trigger("create");
 			$("#panel").trigger( "updatelayout" );
         	$.mobile.changePage("#home",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
@@ -324,7 +278,7 @@ function cargarHome(){
  */
 function cargarPaginaInfo(id_btn, fb){
 	
-	// Mostramos loader
+	// Loader
 	$.mobile.loading( "show", {
 	  text: "Cargando...",
 	  textVisible: true,
@@ -332,13 +286,13 @@ function cargarPaginaInfo(id_btn, fb){
 	  html: ""
 	});
 	
-	// Limpiamos la pantalla antes de comenzar
+	// Clean screen
 	$("#info").empty();
 	
-	// Creamos los elementos de la pagina de informaci�n general de la encuesta
+	// Create elements of the information page of the feedback
 	var info = document.getElementById("info");
 	
-	// TITULO Y DESCRIPCION
+	// TITLE AND DESCRIPTION
 	info.innerHTML = "<h2>"+fb[id_btn].name+"</h2><h3>"+fb[id_btn].intro+"</h3>";
 	
 	// TABLE
@@ -349,27 +303,23 @@ function cargarPaginaInfo(id_btn, fb){
 	
 	// ANONYMOUS
 	if(fb[id_btn].anonymous==1){
-		//info.innerHTML += "<dl><dt>An�nima: </dt><dd>S�</dd>";
-		table.innerHTML += "<tbody><tr><td>An�nima</td><th>S�</th></tr>";
+		table.innerHTML += "<tbody><tr><td>Anónima</td><th>Sí</th></tr>";
 	}
 	else{
-		//info.innerHTML += "<dl><dt>An�nima: </dt><dd>No</dd>";
-		table.innerHTML += "<tbody><tr><td>An�nima</td><th>No</th></tr>";
+		table.innerHTML += "<tbody><tr><td>Anónima</td><th>No</th></tr>";
 	}
 		
 	// MULTIANSWER
 	if(fb[id_btn].multiple_submit==1){
-		//info.innerHTML += "<dt>Multi-respuesta: </dt><dd>S�</dd>";
-		table.innerHTML += "<tr><td>Multi-respuesta</td><th>S�</th></tr>";
+		table.innerHTML += "<tr><td>Multi-respuesta</td><th>Sí</th></tr>";
 	}
 	else{
-		//info.innerHTML += "<dt>Multi-respuesta: </dt><dd>No</dd>";
 		table.innerHTML += "<tr><td>Multi-respuesta</td><th>No</th></tr>";
 	}
 		
 	// TIME OPEN-CLOSE
 	var current_time=new Date().getTime()/1000;
-	// ENCUESTA CERRADA
+	// FEEDBACK CLOSED
 	if(fb[id_btn].timeopen > current_time || (fb[id_btn].timeclose < current_time && fb[id_btn].timeclose > 0)){
 		table.innerHTML += "<tr><td>Plazo</td><th>Cerrado</th></tr></tbody>";
 		info.appendChild(table);
@@ -377,14 +327,14 @@ function cargarPaginaInfo(id_btn, fb){
 		var date_open = new Date(fb[id_btn].timeopen*1000);
 		var date_close = new Date(fb[id_btn].timeclose*1000);
 		
-		// Solo tiene fecha de cierre y esta cerrado
+		// Only has timeclose and is closed
 		if(fb[id_btn].timeopen == 0){
-			info.innerHTML += "<h4><code>La encuesta se cerr� el d�a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
+			info.innerHTML += "<h4><code>La encuesta se cerró el día "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
 			" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
 		}
-		// Solo tiene fecha de apertura y esta cerrado
+		// Only has timeopen and is closed
 		if(fb[id_btn].timeclose == 0){
-			info.innerHTML += "<h4><code>La encuesta se abrir� el d�a "+date_open.getDate()+"/"+(+date_open.getMonth()+1)+"/"+date_open.getFullYear()+
+			info.innerHTML += "<h4><code>La encuesta se abrirá el día "+date_open.getDate()+"/"+(+date_open.getMonth()+1)+"/"+date_open.getFullYear()+
 			" a las "+date_open.getHours()+":"+date_open.getMinutes()+" horas.</code></h4><p></p>";
 		}
 		// Tiene fecha de apertura y cierre y esta cerrado
@@ -395,19 +345,19 @@ function cargarPaginaInfo(id_btn, fb){
 		}
 	}
 	
-	// ENCUESTA ABIERTA
+	// OPEN FEEDBACK
 	else{
 		table.innerHTML += "<tr><td>Plazo</td><th>Abierto</th></tr></tbody><p></p>";
 		info.appendChild(table);
 		
-		// Si tiene una fecha de cierre, avisamos
+		// If it has a timeclose, we alert about the date
 		if(fb[id_btn].timeclose != 0){
 			var date_close = new Date(fb[id_btn].timeclose*1000);
-			info.innerHTML += "<h4><code>La encuesta se cerrar� el d�a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
+			info.innerHTML += "<h4><code>La encuesta se cerrará el día "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
 			" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
 		}
 		
-		// Boton comenzar encuesta
+		// Start feedback button
 		var a = document.createElement("a");
 		a.onclick = (function() {
 			var currentId = id_btn;
@@ -422,7 +372,7 @@ function cargarPaginaInfo(id_btn, fb){
 		info.appendChild(a);
 	}
 	
-	// Vuelve a recrear los estilos, cambia de p�gina y oculta el loader
+	// Create styles again, change page and hide loader
 	$("#info-fb").trigger("create");
 	$.mobile.changePage("#info-fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"slide"});
 	$.mobile.loading("hide");
@@ -433,13 +383,14 @@ function cargarPaginaInfo(id_btn, fb){
  * charges the information page of the feedback selected and "info-fb" pass to 
  * be the active page.
  * 
- * @param {int} id_btn The index to navigate on the "fb" object and access 
+ * @param {int} id_btn The index to navigate on the "sepug_cursos" object and access 
  *  to the selected feedback data.
- * @param {Object} fb Contains all the data related with the user feedbacks.
+ * @param {Object} fb Contains the id of the course.
+ * @param {Object} fb Contains all the data of the SEPUG instance.
  */
 function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	
-	// Mostramos loader
+	// Loader
 	$.mobile.loading( "show", {
 	  text: "Cargando...",
 	  textVisible: true,
@@ -447,13 +398,13 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	  html: ""
 	});
 	
-	// Limpiamos la pantalla antes de comenzar
+	// Clean screen
 	$("#info").empty();
 	
-	// Creamos los elementos de la pagina de informaci�n general de la encuesta
+	// Create elements of the information page of the feedback
 	var info = document.getElementById("info");
 	
-	// TITULO Y DESCRIPCION
+	// TITLE AND DESCRIPTION
 	info.innerHTML = "<h2>"+sepug_instance.name+"</h2><h3>SEPUG: Sistema de Evaluación del Profesorado de la Universidad de Granada, " +
 			"es una herramienta de control de calidad y evaluación del profesorado, para la valoración de las tareas docentes " +
 			"por parte del alumnado en las titulaciones de grado o posgrado. Los estudiantes a través de la cumplimentación ANÓNIMA " +
@@ -471,18 +422,18 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	// MULTIANSWER
 	table.innerHTML += "<tr><td>Multi-respuesta</td><th>No</th></tr>";
 	
-	// ENCUESTA ABIERTA
+	// OPEN SURVEY
 	table.innerHTML += "<tr><td>Plazo</td><th>Abierto</th></tr></tbody><p></p>";
 	info.appendChild(table);
 	
-	// Si tiene una fecha de cierre, avisamos
+	// If it has a timeclose, we alert about the date
 	if(sepug_instance.timeclosestudents != 0){
 		var date_close = new Date(sepug_instance.timeclosestudents*1000);
 		info.innerHTML += "<h4><code>La encuesta se cerrar� el d�a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
 		" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
 	}
 	
-	// Boton comenzar encuesta
+	// Start survey button
 	var a = document.createElement("a");
 	a.onclick = (function() {
 		var currentId = id_btn;
@@ -496,7 +447,7 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	a.appendChild(texto);
 	info.appendChild(a);
 	
-	// Vuelve a recrear los estilos, cambia de p�gina y oculta el loader
+	// Create styles again, change page and hide loader
 	$("#info-fb").trigger("create");
 	$.mobile.changePage("#info-fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"slide"});
 	$.mobile.loading("hide");
@@ -513,6 +464,7 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
  */
 function cargarFB(id_btn, fb){
 	
+	// Loader
 	$.mobile.loading( "show", {
 	  text: "Generando encuesta...",
 	  textVisible: true,
@@ -520,31 +472,31 @@ function cargarFB(id_btn, fb){
 	  html: ""
 	});
 	
-	// Borramos los elementos para volver a generarlos
+	// Clean elements
 	$("#fb_content").empty();
 	$("#btn_fb_cancelar").empty();
 	$("#btn_fb_enviar").empty();
 	
-	// Cargar preguntas
+	// Load questions
 	moodleWSCall("local_fbplugin_get_feedback_questions", {feedbackid: fb[id_btn].id}, function(fb_questions){
 
-		// Si hay alguna pregunta que contestar..
+		// If there is at least one question that can be answered
 		if(fb_questions.length!=0){
 			
 			var contestable = false;
 			var fb_content = document.getElementById("fb_content");
 				
-			// Ordenamos las preguntas segun la posicion en la que deben mostrarse
+			// Sort questions by position
 			fb_questions.sort(function(a, b){return a.position-b.position;});
 			
-			// Creamos los elementos del FB
+			// Create FB elements
 			for(var i=0; i<fb_questions.length; i++){
 				
 				var div = document.createElement("div");
 				div.setAttribute('class','ui-body');
 				fb_content.appendChild(div);
 				
-				// Comprobamos si esta es una pregunta de respuesta obligatoria o no
+				// Check if it's a mandatory question or not
 				var required = false;
 				if(fb_questions[i].required==1)
 					required = true;
@@ -558,22 +510,22 @@ function cargarFB(id_btn, fb){
 					fb_content.appendChild(div);
 				}
 				
-				// TEXTO CORTO - rango caracteres: 5-255
+				// SHORT TEXT - range chars: 5-255
 				if(fb_questions[i].typ == "textfield"){
 					
 					contestable = true;
 					
-					// Obtenemos el maximo de caracteres
+					// Retrieve max. characters
 					var maxcarac = fb_questions[i].presentation.split("|");
 					
-					// Creamos el label (pregunta)
+					// Create label
 					var label = document.createElement("label");
 					label.setAttribute('for', 'p'+i);
 					label.innerHTML = fb_questions[i].name+" (caracteres m�x.: "+maxcarac[1]+")";
 					if(required)
 						label.innerHTML += "*";
 					
-					// Creamos el input
+					// Create input
 					var input = document.createElement("input");
 					input.setAttribute('type', 'text');
 					input.setAttribute('id', 'p'+i);
@@ -585,19 +537,19 @@ function cargarFB(id_btn, fb){
 					
 				}
 				
-				// TEXTO LARGO - filas*columnas (nosotros le damos un tama�o estandar)
+				// LARGE TEXT - row*col (we give it a fixed size)
 				if(fb_questions[i].typ == "textarea"){
 					
 					contestable = true;
 					
-					// Creamos el label (pregunta)
+					// Create label
 					var label = document.createElement("label");
 					label.setAttribute('for', 'p'+i);
 					label.innerHTML = fb_questions[i].name;
 					if(required)
 						label.innerHTML += "*";
 					
-					// Creamos el textarea
+					// Create textarea
 					var textarea = document.createElement("textarea");
 					textarea.setAttribute('id', 'p'+i);
 					textarea.setAttribute('cols', '40');
@@ -609,22 +561,22 @@ function cargarFB(id_btn, fb){
 					
 				}
 				
-				// INPUT NUMERICO - SLIDER
+				// NUMERIC INPUT - SLIDER
 				if(fb_questions[i].typ == "numeric"){
 					
 					contestable = true;
 					
-					// Obtenemos el rango
+					// Retrieve range
 					var rangonum = fb_questions[i].presentation.split("|");
 					
-					// Creamos el label (pregunta)
+					// Create label
 					var label = document.createElement("label");
 					label.setAttribute('for', 'p'+i);
 					label.innerHTML = fb_questions[i].name+" (rango: "+rangonum[0]+"-"+rangonum[1]+")";
 					if(required)
 						label.innerHTML += "*";
 						
-					// Creamos el input
+					// Create input
 					var input = document.createElement("input");
 					input.setAttribute('type', 'range');
 					input.setAttribute('min', rangonum[0]);
@@ -634,25 +586,6 @@ function cargarFB(id_btn, fb){
 					div.appendChild(label);
 					div.appendChild(input);
 					fb_content.appendChild(div);
-					
-					/* PRESENTACION EN FORMATO INPUT
-					// Creamos el label (pregunta)
-					var label = document.createElement("label");
-					label.setAttribute('for', 'p'+i);
-					label.innerHTML = fb_questions[i].name+" (rango:"+fb_questions[i].presentation+")";
-					if(required)
-						label.innerHTML += "*";
-					
-					// Creamos el input
-					var input = document.createElement("input");
-					input.setAttribute('type', 'number');
-					input.setAttribute('data-clear-btn', 'false');
-					input.setAttribute('pattern', '[0-9]*');
-					input.setAttribute('id', 'p'+i);
-					
-					div.appendChild(label);
-					div.appendChild(input);
-					fb_content.appendChild(div);*/
 				}
 				
 				// MULTICHOICE
@@ -660,39 +593,38 @@ function cargarFB(id_btn, fb){
 					
 					contestable = true;
 					
-					// Estructura del presentation:
-					// d>>>>>: lista desplegable
-					// r>>>>>: seleccion radio
-					// c>>>>>: check button
-					// Al final:
-					// <<<<<1: visualizacion horizontal
-					// nada: visualizacion vertical
+					// Field "presentation":
+					// d>>>>>: dropdown list
+					// r>>>>>: radio buttons
+					// c>>>>>: check buttons
+					// at the end of "presentation":
+					// <<<<<1: horizontal view
+					// nada: vertical view
 					
 					// Options:
-					// i: No analiza los envios vacios (NO CONTEMPLADO)
-					// h: la opcion "No Seleccionada" oculto (SOLO FUNCIONA EN MOODLE CON RADIO BUTTON, ASI QUE
-					//	EVITAREMOS A�ADIR LA RESPUESTA EN LOS OTROS DOS TIPOS)
+					// i: not analized empty sends (DON'T CARE)
+					// h: hidden option "No Seleccionada" (ONLY WORKS WITH RADIO BUTTONS, SO WE WILL AVOID ADD THE OPTION IN THE OTHER TYPES)
 					
-					// Eliminamos la cabecera del presentation (y la cola si la hubiera) 
+					// Delete head of "presentation" (and tail if exists) 
 					var respuestas_juntas = fb_questions[i].presentation.substring(6, fb_questions[i].presentation.length);
-					// Contemplamos si la visualizacion es horizontal 
+					// If is horizontal view
 					var horizontal = false;
 					if (respuestas_juntas.match(/<<<<<1/g) != null){ // vertical
 						respuestas_juntas = respuestas_juntas.substring(0, respuestas_juntas.length-6);
 						horizontal = true;
 					}
 					
-					// Guardamos cada posible respuesta en un vector
+					// Save all possible answers in array
 					var respuestas = [];
 					respuestas = respuestas_juntas.split("|");
 					
-					// Detectamos tipo de multichoice: radio o checkbox
+					// Resolve type of multichoice: radio or checkbox
 					if(fb_questions[i].presentation.charAt(0) == 'r' || fb_questions[i].presentation.charAt(0) == 'c'){
 						
 						if(fb_questions[i].presentation.charAt(0) == 'r'){
 							var tipo_multi = "radio";
-							//OPCIONES (SOLO EN RADIO BUTTON)
-							// Contemplamos si "No Seleccionada" esta activo y a�adimos la opci�n
+							// OPTIONS (SOLO EN RADIO BUTTON)
+							// Check if "No Seleccionada" is active and add the option
 							if(fb_questions[i].options.match(/h/g) == null){
 								respuestas.splice(0,0,"No Seleccionada");
 							}
@@ -700,24 +632,24 @@ function cargarFB(id_btn, fb){
 						else
 							var tipo_multi = "checkbox";
 						
-						// Creamos el fieldset
+						// Create fieldset
 						var fieldset = document.createElement("fieldset");
 						fieldset.setAttribute('data-role', 'controlgroup');
 						if(horizontal)
 							fieldset.setAttribute('data-type', 'horizontal');
 						
-						// Creamos legend (enunciado pregunta)
+						// Create legend (question)
 						var legend = document.createElement("legend");
 						legend.innerHTML = fb_questions[i].name;
 						if(required)
 							legend.innerHTML += "*";
 						
-						// Cada respuesta:
+						// Each answer:
 						for(var j=0; j<respuestas.length ; j++){	
 							var input = document.createElement("input");
 							input.setAttribute('type', tipo_multi);
 							input.setAttribute('name', 'p'+i);
-							input.setAttribute('id', 'p'+i+'r'+j); // numero pregunta y respuesta
+							input.setAttribute('id', 'p'+i+'r'+j); // question number and answer number
 							input.setAttribute('value', j);
 							var label = document.createElement("label");
 							label.setAttribute('for', 'p'+i+'r'+j);
@@ -731,13 +663,12 @@ function cargarFB(id_btn, fb){
 						fb_content.appendChild(div);
 						
 					}else{
-						// SELECT (lista desplegable)
+						// SELECT (dropdown list)
 						
-						// Se a�ade por defecto un hueco en blanco al principio 
-						// para contemplar la no contestacion de la pregunta
+						// By default, we add a blank option at the beginning (not answered)
 						respuestas.splice(0,0,"");
 	
-						// Creamos el label general
+						// Create general label
 						var label = document.createElement("label");
 						label.setAttribute('for', 'p'+i+'r'+j);
 						label.setAttribute('class', 'select');
@@ -745,11 +676,11 @@ function cargarFB(id_btn, fb){
 						if(required)
 							label.innerHTML += "*";
 						
-						// Creamos el select
+						// Create select
 						var select = document.createElement("select");
 						select.setAttribute('id', 'p'+i);
 					
-						// Cada respuesta:
+						// Each answer:
 						for(var j=0; j<respuestas.length ; j++){	
 							var option = document.createElement("option");
 							option.setAttribute('value', j);
@@ -765,13 +696,13 @@ function cargarFB(id_btn, fb){
 				} // end if
 			} // end for
 			
-			// Comprobamos ahora si existe al menos alguna pregunta contestable
+			// If there is at least one question that can be answered
 			if(contestable){
 			
 				var btn_fb_enviar = document.getElementById("btn_fb_enviar");
 				var btn_fb_cancelar = document.getElementById("btn_fb_cancelar");
 				
-				// Boton Cancelar
+				// Cancel button
 				var a = document.createElement("a");
 				a.setAttribute('data-role', 'button');
 				a.setAttribute('data-rel', 'back');
@@ -779,7 +710,7 @@ function cargarFB(id_btn, fb){
 				a.innerHTML = "Cancelar";
 				btn_fb_cancelar.appendChild(a);
 				
-				// Boton Enviar
+				// Send button
 				var a = document.createElement("a");
 				a.setAttribute('data-role', 'button');
 				a.setAttribute('data-icon', 'check');
@@ -789,18 +720,18 @@ function cargarFB(id_btn, fb){
 			}
 			else{
 				
-				// Borramos los posibles elementos no contestables imprimidos
+				// Delete printed elements that can not be answered
 				$("#fb_content").empty();
 				var div = document.createElement("div");
 				div.setAttribute('class','ui-body');
 				fb_content.appendChild(div);
 				
 				var p = document.createElement("p");		
-				p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todav�a.";
+				p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todavía.";
 				div.appendChild(p);
 				fb_content.appendChild(div);
 				
-				// Boton Cancelar
+				// Cancel button
 				var a = document.createElement("a");
 				a.setAttribute('data-role', 'button');
 				a.setAttribute('data-rel', 'back');
@@ -811,7 +742,7 @@ function cargarFB(id_btn, fb){
 			
 		}// end if
 		
-		// Si no hay preguntas que contestar
+		// If there are no questions..
 		else{
 			var fb_content = document.getElementById("fb_content");
 			
@@ -820,11 +751,11 @@ function cargarFB(id_btn, fb){
 			fb_content.appendChild(div);
 			
 			var p = document.createElement("p");		
-			p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todav�a.";
+			p.innerHTML = "Esta encuesta no dispone de ninguna pregunta todavía.";
 			div.appendChild(p);
 			fb_content.appendChild(div);
 			
-			// Boton Cancelar
+			// Cancel button
 			var a = document.createElement("a");
 			a.setAttribute('data-role', 'button');
 			a.setAttribute('data-rel', 'back');
@@ -833,7 +764,7 @@ function cargarFB(id_btn, fb){
 			fb_content.appendChild(a);
 		}
 		
-		// Vuelve a recrear los estilos, cambia de p�gina y oculta el loader
+		// Create styles again, change page and hide loader
 		$("#fb").trigger("create");
 		$.mobile.changePage("#fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
 		$( ".selector" ).loader( "hide" );
@@ -843,14 +774,15 @@ function cargarFB(id_btn, fb){
 /**
  * Using the same content obtained before in the "cargarHome()" function and 
  * more extra data about the questions of the feedback calling "get_feedback_questions" 
- * Web Service function, it generates a feedback and changes the active page by "fb".
+ * Web Service function, it generates a feedback and changes the active page by "sepug_cursos".
  * 
- * @param {int} id_btn The index to navigate on the "fb" object and access 
- *  to the selected feedback data.
- * @param {Object} fb Contains all the data related with the user feedbacks.
+ * @param {int} id_btn The index to navigate on the "sepug_cursos" object and access 
+ *  to the selected survey data.
+ * @param {Object} sepug_cursos Contains the id of the course.
  */
 function cargarSEPUG(id_btn, sepug_cursos){
 	
+	// Loader
 	$.mobile.loading( "show", {
 	  text: "Generando encuesta...",
 	  textVisible: true,
@@ -858,53 +790,51 @@ function cargarSEPUG(id_btn, sepug_cursos){
 	  html: ""
 	});
 	
-	// Borramos los elementos para volver a generarlos
+	// Clean elementsBorramos los elementos para volver a generarlos
 	$("#fb_content").empty();
 	$("#btn_fb_cancelar").empty();
 	$("#btn_fb_enviar").empty();
 	
-	// Cargar preguntas
+	// Load questions
 	moodleWSCall("mod_sepug_get_survey_questions", {courseid: sepug_cursos[id_btn].id}, function(sepug_questions){
 
-		// Si hay alguna pregunta que contestar..
+		// If there is at least one question
 		if(sepug_questions.length!=0){
 			
-			//var contestable = false;
 			var respuestas = [];
 			var fb_content = document.getElementById("fb_content");
 			
-			// Creamos los elementos del FB
+			// Create FB elements
 			for(var i=0; i<sepug_questions.length; i++){
 				
 				var div = document.createElement("div");
 				div.setAttribute('class','ui-body');
 				fb_content.appendChild(div);
 				
-				// Guardamos cada posible respuesta en un vector
+				// Save each answer in array
 				respuestas = null;
 				respuestas = sepug_questions[i].options.split(",");
 				
-				// Solo hay dos tipos: tipo 1 radio y tipo 2 select
+				// SEPUG has only two types, typo 1: radio y typo 2: select
 				
 				// MULTICHOICE - radio
 				if(sepug_questions[i].type == 1){
 
-					// Creamos el fieldset
+					// Create fieldset
 					var fieldset = document.createElement("fieldset");
 					fieldset.setAttribute('data-role', 'controlgroup');
-					//fieldset.setAttribute('data-type', 'horizontal');
 					
-					// Creamos legend (enunciado pregunta)
+					// Create legend (question)
 					var legend = document.createElement("legend");
 					legend.innerHTML = sepug_questions[i].text;
 					legend.innerHTML += "*";
 					
-					// Cada respuesta:
+					// Each answer:
 					for(var j=0; j<respuestas.length ; j++){	
 						var input = document.createElement("input");
 						input.setAttribute('type', 'radio');
 						input.setAttribute('name', 'p'+i);
-						input.setAttribute('id', 'p'+i+'r'+j); // numero pregunta y respuesta
+						input.setAttribute('id', 'p'+i+'r'+j); // question number and answer number
 						input.setAttribute('value', j);
 						var label = document.createElement("label");
 						label.setAttribute('for', 'p'+i+'r'+j);
@@ -921,22 +851,21 @@ function cargarSEPUG(id_btn, sepug_cursos){
 				// MULTICHOICE - select
 				if(sepug_questions[i].type == 2){
 				
-					// Se a�ade por defecto un hueco en blanco al principio 
-					// para contemplar la no contestacion de la pregunta
+					// By default, we add a blank option at the beginning (not answered)
 					respuestas.splice(0,0,"");
 	
-					// Creamos el label general
+					// Create general label
 					var label = document.createElement("label");
 					label.setAttribute('for', 'p'+i+'r'+j);
 					label.setAttribute('class', 'select');
 					label.innerHTML = sepug_questions[i].text;
 					label.innerHTML += "*";
 					
-					// Creamos el select
+					// Create select
 					var select = document.createElement("select");
 					select.setAttribute('id', 'p'+i);
 				
-					// Cada respuesta:
+					// Each answer:
 					for(var j=0; j<respuestas.length ; j++){	
 						var option = document.createElement("option");
 						option.setAttribute('value', j);
@@ -955,7 +884,7 @@ function cargarSEPUG(id_btn, sepug_cursos){
 			var btn_fb_enviar = document.getElementById("btn_fb_enviar");
 			var btn_fb_cancelar = document.getElementById("btn_fb_cancelar");
 			
-			// Boton Cancelar
+			// Cancel button
 			var a = document.createElement("a");
 			a.setAttribute('data-role', 'button');
 			a.setAttribute('data-rel', 'back');
@@ -963,7 +892,7 @@ function cargarSEPUG(id_btn, sepug_cursos){
 			a.innerHTML = "Cancelar";
 			btn_fb_cancelar.appendChild(a);
 			
-			// Boton Enviar
+			// Send button
 			var a = document.createElement("a");
 			a.setAttribute('data-role', 'button');
 			a.setAttribute('data-icon', 'check');
@@ -973,7 +902,7 @@ function cargarSEPUG(id_btn, sepug_cursos){
 	
 		}// end if
 		
-		// Vuelve a recrear los estilos, cambia de p�gina y oculta el loader
+		// Create styles again, change page and hide loader
 		$("#fb").trigger("create");
 		$.mobile.changePage("#fb",{allowSamePageTransition:true,reloadPage:false,changeHash:true,transition:"pop"});
 		$( ".selector" ).loader( "hide" );
@@ -990,13 +919,13 @@ function cargarSEPUG(id_btn, sepug_cursos){
  */
 function enviarFB(fb_questions, fb_id){ 
 	
-	// ESTRUCTURA DE DATOS DE LA BD PARA "FEEDBACK_VALUE"
+	// DATABASE STRUCTURE OF TABLE "FEEDBACK_VALUE"
 	// MULTICHOICE:
-	// RADIO BUTTON(cambia, sumar 1 a los ids o dejar como esta) -> opciones con id[1..N], no seleccionada como primera opcion con id=0, ej: 2
-	// CHECK BOX(sumar 1 a los ids) -> opciones con id[1..N], no funciona no seleccionada (simplemente no marcar ninguna), ej: 2|3 
-	// SELECT(bien) -> se a�ade un hueco en blanco como primera opcion con id=0, no funciona no seleccionada (hueco en blanco), ej: 1 
+	// RADIO BUTTON(change, sum 1 to the ID or maybe leave it equal) -> options with id[1..N], "No seleccionada" as first option with id=0, ex: 2
+	// CHECK BOX(sum 1 to the ID's) -> options with id[1..N], "No seleccionada" doesn't work here (don't do anything), ex: 2|3 
+	// SELECT(same as JQuery) -> add blank option with id=0, "No seleccionad" doesn't work here (just a blank option), ex: 1 
 	
-	// Creamos el object a enviar a la BD
+	// Create object to send to the DB
 	var valores = [];
 	var value;
 	var salir = false;
@@ -1005,12 +934,11 @@ function enviarFB(fb_questions, fb_id){
 		
 		value = "";
 		
-		// Si es alguno de los tipos contemplados y contestables..
+		// If its a expected type
 		if(fb_questions[i].typ == "multichoice" || fb_questions[i].typ == "numeric" || fb_questions[i].typ == "textarea" ||
 		fb_questions[i].typ == "textfield"){
 			
-			//COMPROBACIONES
-			// Si es una pregunta obligatoria, nos aseguramos que tenga valor
+			// If it's a mandatory question, we secure that it has value
 			if(fb_questions[i].typ == "multichoice" && fb_questions[i].presentation.charAt(0) != 'd'){
 				
 				if($('input[name=p'+i+']:checked', '#FBform').val()==undefined && fb_questions[i].required==1){
@@ -1019,7 +947,8 @@ function enviarFB(fb_questions, fb_id){
 				}
 				else{
 					if(fb_questions[i].presentation.charAt(0) == 'r'){ // RADIO BUTTON
-						// Contemplamos si "No Seleccionada" esta activo
+						
+						// "No seleccionada" is checked or not
 						if(fb_questions[i].options.match(/h/g) == null){
 							value = $('input[name=p'+i+']:checked', '#FBform').val();
 						}
@@ -1033,7 +962,7 @@ function enviarFB(fb_questions, fb_id){
 								value += +this.value+1+'|';
 							}
 						});
-						// Eliminamos el ultimo separador sobrante
+						// Delete last slash
 						value = value.slice(0,value.length-1);
 					}
 				}			
@@ -1042,7 +971,7 @@ function enviarFB(fb_questions, fb_id){
 
 				// SELECT
 				if(fb_questions[i].typ == "multichoice" && fb_questions[i].presentation.charAt(0) == 'd'){
-					// Tanto no haber seleccionado nada, como tener marcada la primera opcion que esta en blanco..
+					// If the first option (blank) is selected..
 					if(($("#p"+i).val()==0 || $("#p"+i).val()=="") && fb_questions[i].required==1){
 						alert("Error: compruebe si ha respondido a todas las preguntas obligatorias.");
 						salir = true;
@@ -1052,7 +981,7 @@ function enviarFB(fb_questions, fb_id){
 					}
 				}
 				else{
-					// RESTO DE TIPOS
+					// OTHER TYPES
 					if($("#p"+i).val()=="" && fb_questions[i].required==1){
 						alert("Error: compruebe si ha respondido a todas las preguntas obligatorias.");
 						salir = true;
@@ -1067,7 +996,7 @@ function enviarFB(fb_questions, fb_id){
 		}
 	}
 	
-	// Si todo ha ido bien, procedemos a realizar el envio
+	// If all is ok, start the send
 	if(salir == false){
 		
 		moodleWSCall("local_fbplugin_complete_feedback", {feedbackid: fb_id , itemvalues: valores}, function(result){		
@@ -1080,16 +1009,16 @@ function enviarFB(fb_questions, fb_id){
 }
 
 /**
- * Using the questions data obtained in "cargarFB(id_btn, fb)" function, it will process
+ * Using the question data obtained in "cargarSEPUG(id_btn, fb)" function, it will process
  * the completed feedback by the user and will send the results to register them in 
- * the Moodle data base by calling "complete_feedback" Web Service function.
+ * the Moodle data base by calling "mod_sepug_submit_survey" Web Service function.
  * 
- * @param {Object} fb_questions Contains all the questions data about the completed feedback.
- * @param {int} fb_id The moodle index of the completed feedback.
+ * @param {Object} sepug_questions Contains all the questions of the survey.
+ * @param {Object} sepug_course Contains the course id and group id, necessary to store correctly the data
  */
 function enviarSEPUG(sepug_questions, sepug_course){ 
 	
-	// Creamos el object a enviar a la BD
+	// Create the object to send
 	var valores = [];
 	var value;
 	var salir = false;
@@ -1100,7 +1029,7 @@ function enviarSEPUG(sepug_questions, sepug_course){
 		
 		value = null;
 		
-		// Si es alguno de los tipos contemplados y contestables..
+		// If it's a expected type
 		if(sepug_questions[i].type == 1){
 			
 			if($('input[name=p'+i+']:checked', '#FBform').val()==undefined){
@@ -1114,7 +1043,7 @@ function enviarSEPUG(sepug_questions, sepug_course){
 		
 		else if(sepug_questions[i].type == 2){
 			
-			// Tanto no haber seleccionado nada, como tener marcada la primera opcion que esta en blanco..
+			// If the first option (blank) is selected..
 			if(($("#p"+i).val()==0 || $("#p"+i).val()=="")){
 				alert("Error: compruebe si ha respondido a todas las preguntas obligatorias.");
 				salir = true;
@@ -1127,7 +1056,7 @@ function enviarSEPUG(sepug_questions, sepug_course){
 		valores.push({questionid: sepug_questions[i].id, time: parseInt(current_time), answer: value});
 	}
 	
-	// Si todo ha ido bien, procedemos a realizar el envio
+	// If all is ok, start the send
 	if(salir == false){
 		
 		moodleWSCall("mod_sepug_submit_survey", {courseid: sepug_course.id, groupid: sepug_course.groupid, itemvalues: valores}, function(result){		
@@ -1152,7 +1081,7 @@ function login(){
 	  html: ""
 	});
 	
-	// Datos usuario
+	// User data
 	URL = $("#urlsitio").val();
     username = $("#nombredeusuario").val();
     var password = $("#clave").val();
@@ -1160,7 +1089,7 @@ function login(){
     mytoken = "";
     login_state = false;
 
-    // Intentamos obtener un token valido
+    // Try to obtain a valid token
 	$.ajax({
 		async: false,
 	    url:loginURL,
@@ -1175,9 +1104,8 @@ function login(){
     success:function(respuesta) {
     	
         if (typeof(respuesta.token) != 'undefined') {
-        	// Almacenamos el token que usaremos para el resto de consultas
+        	// Store token to use it later for the WS queries
         	mytoken = respuesta.token;
-            //alert("Login correcto, su token es:"+mytoken);
             login_state = true;
             
 		}else {
@@ -1231,13 +1159,13 @@ function moodleWSCall(method, json, callback) {
 
         success: function(data) {
         	
-            // Algunas funciones pueden devolver null
+            // Some functions can return null
             if(data != null){
             	
-				// Si devuelve un error..
+				// If returns an error..
 	            if (typeof(data.exception) != 'undefined') {
 	                if (data.errorcode == "invalidtoken" || data.errorcode == "accessexception") {
-	                    // Conexion perdida
+	                    // Connection lost
 	                    alert('Error: vuelva a iniciar sesi�n en la aplicaci�n.');
 	                    $.mobile.changePage("#inicio");
 	                    $.mobile.loading("hide");
@@ -1255,7 +1183,7 @@ function moodleWSCall(method, json, callback) {
 	                return;
 	            }
 	
-				// Si todo ha ido bien, obtenemos nuestro data..
+				// If all is ok, we get the data object
 	            if (typeof(data) == 'object') {
 	                callback(data);
 	                return data;
@@ -1270,20 +1198,11 @@ function moodleWSCall(method, json, callback) {
         
         error: function(xhr, ajaxOptions, thrownError) {
 
-            //var error = "no es posible la conexi�n, compruebe si dispone de acceso a internet.";
-            //if (xhr.status == 404) {
-            //    error = "no es posible conectar con el servidor, intentelo de nuevo m�s tarde.";
-            //}
             dump(xhr);
             dump(ajaxOptions);
             dump(thrownError);
             
             alert("Error "+xhr.status+": "+thrownError);
-            
-            // Error para desarrollador
-            //alert('WS: error on ' + method + ' error: ' + error);
-            
-            //alert("Problema de red: "+error);
             
             $.mobile.loading("hide");
     	}

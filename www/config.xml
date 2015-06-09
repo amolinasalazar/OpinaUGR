@@ -1,5 +1,5 @@
 <?xml version='1.1' encoding='utf-8'?>
-<widget id="es.cevug.encuestasapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget id="es.cevug.encuestasapp" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>OpinaUGR</name>
     <description>
         Visualiza y cumplimenta tus encuestas de Moodle de manera rápida y sencilla.
