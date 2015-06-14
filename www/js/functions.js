@@ -96,7 +96,7 @@ function cargarHome(){
 			moodleWSCall("local_fbplugin_get_feedbacks_by_courses", {courseids: id_cursos}, function(feedbacks){
 				moodleWSCall("mod_sepug_get_sepug_instance", {}, function(sepug_instance){
 					moodleWSCall("mod_sepug_get_not_submitted_enrolled_courses_as_student", {}, function(sepug_courses){
-//var_dump(sepug_courses);
+
 				// Declarations
 				id_cursos = null;
 				id_cursos = [];
@@ -405,7 +405,7 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	var info = document.getElementById("info");
 	
 	// TITLE AND DESCRIPTION
-	info.innerHTML = "<h2>"+sepug_instance.name+"</h2><h3>SEPUG: Sistema de Evaluación del Profesorado de la Universidad de Granada, " +
+	info.innerHTML = "<h2>"+sepug_instance.name+"</h2><h3 align=\"justify\">SEPUG: Sistema de Evaluación del Profesorado de la Universidad de Granada, " +
 			"es una herramienta de control de calidad y evaluación del profesorado, para la valoración de las tareas docentes " +
 			"por parte del alumnado en las titulaciones de grado o posgrado. Los estudiantes a través de la cumplimentación ANÓNIMA " +
 			"de un BREVE cuestionario, pueden valorar a los profesores de las asignaturas que cursan.</h3>";
@@ -417,7 +417,7 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	table.innerHTML = "<thead><tr><td>                        </td><td>                 </td></tr></thead>";
 	
 	// ANONYMOUS
-	table.innerHTML += "<tbody><tr><td>An�nima</td><th>Sí</th></tr>";
+	table.innerHTML += "<tbody><tr><td>Anónima</td><th>Sí</th></tr>";
 		
 	// MULTIANSWER
 	table.innerHTML += "<tr><td>Multi-respuesta</td><th>No</th></tr>";
@@ -429,7 +429,7 @@ function cargarPaginaInfoSepug(id_btn, sepug_cursos, sepug_instance){
 	// If it has a timeclose, we alert about the date
 	if(sepug_instance.timeclosestudents != 0){
 		var date_close = new Date(sepug_instance.timeclosestudents*1000);
-		info.innerHTML += "<h4><code>La encuesta se cerrar� el d�a "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
+		info.innerHTML += "<h4><code>La encuesta se cerrará el día "+date_close.getDate()+"/"+(+date_close.getMonth()+1)+"/"+date_close.getFullYear()+
 		" a las "+date_close.getHours()+":"+date_close.getMinutes()+" horas.</code></h4><p></p>";
 	}
 	
@@ -521,7 +521,7 @@ function cargarFB(id_btn, fb){
 					// Create label
 					var label = document.createElement("label");
 					label.setAttribute('for', 'p'+i);
-					label.innerHTML = fb_questions[i].name+" (caracteres m�x.: "+maxcarac[1]+")";
+					label.innerHTML = fb_questions[i].name+" (caracteres máx.: "+maxcarac[1]+")";
 					if(required)
 						label.innerHTML += "*";
 					
@@ -1069,6 +1069,54 @@ function enviarSEPUG(sepug_questions, sepug_course){
 }
 
 /**
+ * SAML login
+ */
+function customLogin(){
+
+	URL = $('#urlsitio').val();
+	passport = Math.random() * 1000;
+	
+	var launchSiteURL = URL + "/local/fbplugin/launch.php?service=" + WS_short_name + "&passport=" + passport;
+	var ref = window.open(encodeURI(launchSiteURL),"_system");
+    return;
+}
+
+/**
+ * SAML login
+ */
+function handleOpenURL(url) {
+
+    url = url.replace("opinaugr://token=", "");
+        	// Decode from base64.
+    url = atob(url);
+    var params = url.split(":::");
+    var signature = hex_md5(URL + passport);
+    
+    if (signature != params[0]) {
+	    if (URL.indexOf("https://") != -1) {
+	        URL = URL.replace("https://", "http://");
+	    } else {
+	        URL = URL.replace("http://", "https://");
+	    }
+	    signature = hex_md5(URL + passport);
+	}
+
+    if (signature == params[0]) {
+        login_state = true;
+        mytoken = params[1];
+        cargarHome();
+        return;
+        		
+    } else {
+
+      	console.log("Invalid signature in the URL request yours: " + params[0] + " mine: " + signature + "for passport " + passport);
+        login_state = false;
+    }
+    return false;
+
+}
+
+/**
  * A moodle WebService call to login.
  */
 function login(){
@@ -1103,13 +1151,8 @@ function login(){
     
     success:function(respuesta) {
     	
-        if (typeof(respuesta.token) != 'undefined') {
-        	// Store token to use it later for the WS queries
-        	mytoken = respuesta.token;
-            login_state = true;
-            
-		}else {
-            var error = "compruebe su usuario y contrase�a.";
+    	if (response.error) {
+    		var error = "compruebe su usuario y contraseña.";
 
             if (typeof(respuesta.error) != 'undefined') {
                 error = respuesta.error;
@@ -1117,14 +1160,31 @@ function login(){
             alert("Acceso denegado: "+error);
             login_state = false;
             $.mobile.loading("hide");
-        }
+    		
+    	}
+    	else{
+    		
+    		var code = parseInt(response.code, 10);
+    		
+    		switch (code) {
+            case 1: //NORMAL LOGIN
+            	// Store token to use it later for the WS queries
+            	mytoken = respuesta.token;
+                login_state = true;
+                break;
+            case 2: //SAML
+            	customLogin();
+                break;
+    		}
+    	}
+        
         return;
     },
         
     error:function(xhr, textStatus, errorThrown) {
-        var error = "no es posible la conexi�n, compruebe si dispone de acceso a internet.";
+        var error = "no es posible la conexión, compruebe si dispone de acceso a internet.";
         if (xhr.status == 404) {
-        	error = "no es posible conectar con el servidor, intentelo de nuevo m�s tarde.";
+        	error = "no es posible conectar con el servidor, intentelo de nuevo más tarde.";
         }
         
         alert("Problema de red: "+error);
@@ -1166,7 +1226,7 @@ function moodleWSCall(method, json, callback) {
 	            if (typeof(data.exception) != 'undefined') {
 	                if (data.errorcode == "invalidtoken" || data.errorcode == "accessexception") {
 	                    // Connection lost
-	                    alert('Error: vuelva a iniciar sesi�n en la aplicaci�n.');
+	                    alert('Error: vuelva a iniciar sesión en la aplicación.');
 	                    $.mobile.changePage("#inicio");
 	                    $.mobile.loading("hide");
 	                    return;
