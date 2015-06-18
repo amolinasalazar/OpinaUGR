@@ -47,7 +47,9 @@
 		<!-- CONTENIDO -->
 		<div class="ui-body ui-body-b" style="margin-top: 5px; text-align:center">
 			<label>Toca el icono para acceder a través de:</label>
-			<a onclick = "$('#urlsitio').val(login_URL);"><img id="login_img" src="img" style="max-width:100%;"/></a>
+			<a onclick = "$('#urlsitio').val(login_URL);" data-role="button" data-shadow="false" data-theme="none">
+				<img id="login_img" src="img" border="0" style="max-width:100%;"/>
+			</a>
 		</div>
 		<div data-role="content">
 			<form id="formulario">
@@ -286,6 +288,7 @@
 			cargarHome();
 		}
 		
+		$.mobile.loading("hide");
 		return false;
 	});
 
