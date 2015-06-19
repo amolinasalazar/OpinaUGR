@@ -1137,6 +1137,7 @@ function login(){
     
     if(URL=="" || username=="" || password==""){
     	navigator.notification.alert("Comprueba si has rellenado todos los campos.", null, "Información");
+    	$.mobile.loading("hide");
     	return;
     }
     
