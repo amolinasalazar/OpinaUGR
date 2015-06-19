@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses>. */
 
 // The service shortname
-var WS_short_name = 'ws_encuestas'; 
+var WS_short_name = 'opinaws'; 
 
 // The login image that app shows on the first screen. 
 var login_img = 'img/prado2.png';
