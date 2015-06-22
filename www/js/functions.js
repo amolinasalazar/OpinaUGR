@@ -245,7 +245,8 @@ function cargarHome(){
 					grupo_cursos.appendChild(div);
 				}
 			}
-			if(fb_generales.length == 0 && sepug_cursos.length == 0){
+
+			if(fb_cursos.length == 0 && sepug_cursos.length == 0){
 				var p = document.createElement("p");		
 				p.innerHTML = "En estos momentos, usted no dispone de ninguna encuesta asociada a algun curso.";
 				p.setAttribute('align', 'justify');
@@ -476,6 +477,9 @@ function cargarFB(id_btn, fb){
 	$("#fb_content").empty();
 	$("#btn_fb_cancelar").empty();
 	$("#btn_fb_enviar").empty();
+	
+	var fb_title = document.getElementById("fb_head");
+	fb_title.innerHTML = "<h1>"+fb[id_btn].name+"</h1>";
 	
 	// Load questions
 	moodleWSCall("local_fbplugin_get_feedback_questions", {feedbackid: fb[id_btn].id}, function(fb_questions){
@@ -795,6 +799,9 @@ function cargarSEPUG(id_btn, sepug_cursos){
 	$("#btn_fb_cancelar").empty();
 	$("#btn_fb_enviar").empty();
 	
+	var fb_title = document.getElementById("fb_head");
+	fb_title.innerHTML = "<h1>"+"SEPUG - "+sepug_cursos[id_btn].fullname+"</h1>";
+	
 	// Load questions
 	moodleWSCall("mod_sepug_get_survey_questions", {courseid: sepug_cursos[id_btn].id}, function(sepug_questions){
 
@@ -864,7 +871,7 @@ function cargarSEPUG(id_btn, sepug_cursos){
 					// Create select
 					var select = document.createElement("select");
 					select.setAttribute('id', 'p'+i);
-				
+
 					// Each answer:
 					for(var j=0; j<respuestas.length ; j++){	
 						var option = document.createElement("option");
