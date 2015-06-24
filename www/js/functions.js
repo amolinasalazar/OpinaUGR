@@ -1183,16 +1183,17 @@ function login(){
             	mytoken = respuesta.token;
                 login_state = true;
     		}
-    		else{
-    			//SAML
-            	customLogin();
-    		}
+    		
     	}
         
         return;
     },
         
     error:function(xhr, textStatus, errorThrown) {
+    	
+    	//SAML
+    	customLogin();
+    	
         var error = "compruebe si los datos introducidos son correctos o intentelo de nuevo más tarde.";
         if (xhr.status == 404) {
         	error = "no es posible conectar con el servidor, intentelo de nuevo más tarde.";
