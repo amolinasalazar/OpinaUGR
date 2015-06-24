@@ -949,8 +949,7 @@ function enviarFB(fb_questions, fb_id){
 			if(fb_questions[i].typ == "multichoice" && fb_questions[i].presentation.charAt(0) != 'd'){
 				
 				if($('input[name=p'+i+']:checked', '#FBform').val()==undefined && fb_questions[i].required==1){
-					navigator.notification.alert("Error: compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
-					"Error "+xhr.status+": "+thrownError
+					navigator.notification.alert("Compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
 					salir = true;
 				}
 				else{
@@ -981,7 +980,7 @@ function enviarFB(fb_questions, fb_id){
 				if(fb_questions[i].typ == "multichoice" && fb_questions[i].presentation.charAt(0) == 'd'){
 					// If the first option (blank) is selected..
 					if(($("#p"+i).val()==0 || $("#p"+i).val()=="") && fb_questions[i].required==1){
-						navigator.notification.alert("Error: compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
+						navigator.notification.alert("Compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
 						salir = true;
 					}
 					else{
@@ -991,7 +990,7 @@ function enviarFB(fb_questions, fb_id){
 				else{
 					// OTHER TYPES
 					if($("#p"+i).val()=="" && fb_questions[i].required==1){
-						navigator.notification.alert("Error: compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
+						navigator.notification.alert("Compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
 						salir = true;
 					}
 					else{
@@ -1041,7 +1040,7 @@ function enviarSEPUG(sepug_questions, sepug_course){
 		if(sepug_questions[i].type == 1){
 			
 			if($('input[name=p'+i+']:checked', '#FBform').val()==undefined){
-				navigator.notification.alert("Error: compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
+				navigator.notification.alert("Compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
 				salir = true;
 			}
 			else{
@@ -1053,7 +1052,7 @@ function enviarSEPUG(sepug_questions, sepug_course){
 			
 			// If the first option (blank) is selected..
 			if(($("#p"+i).val()==0 || $("#p"+i).val()=="")){
-				navigator.notification.alert("Error: compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
+				navigator.notification.alert("Compruebe si ha respondido todas las preguntas obligatorias.", null, "Información");
 				salir = true;
 			}
 			else{
@@ -1171,7 +1170,7 @@ function login(){
             if (typeof(respuesta.error) != 'undefined') {
                 error = respuesta.error;
             }
-            navigator.notification.alert("Acceso denegado: "+error, null, "Información");
+            navigator.notification.alert(error, null, "Acceso denegado");
             login_state = false;
             $.mobile.loading("hide");
     		
@@ -1199,7 +1198,7 @@ function login(){
         	error = "no es posible conectar con el servidor, intentelo de nuevo más tarde.";
         }
         
-        navigator.notification.alert("Problema de red: "+error, null, "Información");
+        navigator.notification.alert(error, null, "Información");
 
         login_state = false;
         $.mobile.loading("hide");
@@ -1239,20 +1238,19 @@ function moodleWSCall(method, json, callback) {
 	            if (typeof(data.exception) != 'undefined') {
 	                if (data.errorcode == "invalidtoken" || data.errorcode == "accessexception") {
 	                    // Connection lost
-	                    navigator.notification.alert('Error: vuelva a iniciar sesión en la aplicación.', null, "Información");
+	                    navigator.notification.alert('Vuelva a iniciar sesión en la aplicación.', null, "Error");
 	                    $.mobile.changePage("#inicio");
 	                    $.mobile.loading("hide");
 	                    return;
 	                } else {
-	                	navigator.notification.alert('Error: ' + data.message, null, "Información");
-	                	'Error: vuelva a iniciar sesión en la aplicación.'
+	                	navigator.notification.alert(data.message, null, "Información");
 	                	$.mobile.loading("hide");
 	                }
 	                return;
 	            }
 	
 	            if (typeof(data.debuginfo) != 'undefined') {
-	            	navigator.notification.alert('Error: ' + data.message, null, "Información");
+	            	navigator.notification.alert(data.message, null, "Información");
 	                $.mobile.loading("hide");
 	                return;
 	            }
@@ -1271,7 +1269,7 @@ function moodleWSCall(method, json, callback) {
         },
         
         error: function(xhr, ajaxOptions, thrownError) {
-            navigator.notification.alert("Error "+xhr.status+": "+thrownError, null, "Información");
+            navigator.notification.alert(xhr.status+": "+thrownError, null, "Error");
             $.mobile.loading("hide");
     	}
 	});
