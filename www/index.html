@@ -30,6 +30,14 @@
     <script src="cordova.js"></script>
     <script src="js/functions.js"></script>
     <script src="js/configuration.js"></script>
+    <script>
+    	/**
+		 * Hook the return of the browser when server has custom login
+		 */
+		function handleOpenURL(url) {
+		    appLaunchedByURL(url);
+		}
+    </script>
 
 </head>
  
@@ -40,7 +48,7 @@
 		
 		<!-- CABECERA -->
 		<div data-role="header">
-			<a href="#ayuda" class="ui-btn-right ui-btn ui-shadow ui-corner-all ui-icon-info ui-btn-icon-notext"></a>
+			<a href="#acercade" class="ui-btn-right ui-btn ui-shadow ui-corner-all ui-icon-info ui-btn-icon-notext"></a>
 			<h1>OpinaUGR</h1>
 		</div>
 	 
@@ -61,6 +69,9 @@
 				<input type="password" id="clave" name="clave" data-mini="true">
 				<label>
 				<input id="check" name="check" type="checkbox" checked="checked" data-mini="true">Recordar
+				</label>
+				<label>
+				<input id="login_check" name="login_check" type="checkbox" data-mini="true">Identificación IDP
 				</label><br>
 				<input type="submit" value="Iniciar sesión" id="botonLogin">
 				<p style="text-align:center">Inicia sesión con tu usuario y contraseña asociada a tu perfil de Moodle.</p>
@@ -148,11 +159,13 @@
 		</div>
 		
 		<div data-role="content">
-			
+
 			<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de facilitar a la comunidad universitaria el 
 				intercambio de información profesor-alumno a través de las nuevas tecnologías.</p>
 			<p align="justify">Su objetivo es mejorar, flexibilizar y automatizar el uso de encuestas para permitir la recogida de opiniones, 
 			votaciones populares, resolución de problemas o la toma de decisiones.</p>
+			
+			<a href="#ayuda" data-role="button">FAQ</a>
 			
 			<div class="ui-bar ui-bar-a">
 				Promovido por:
@@ -214,7 +227,6 @@
 		</div>
 
 		<div data-role="content">
-			<a href="#acercade" data-role="button">Acerca de</a>
 			<h1>¿Qué es OpinaUGR?</h1>
 			<p align="justify">OpinaUGR es una aplicación ligera e intuitiva que nace con la intención de facilitar a la comunidad universitaria el 
 			intercambio de información profesor-alumno a través de las nuevas tecnologías. Su objetivo es mejorar, flexibilizar y automatizar
@@ -237,7 +249,7 @@
 			<h1>¿A quién va dirigido OpinaUGR?</h1>
 			<p align="justify">A cualquier usuario de Moodle, tanto estudiantes como profesorado.</p>
 			<h1>¿Que tipo de elementos están soportados por la aplicación?</h1>
-			<p align="justify">OpinaUGR descarga las encuestas que son creadas a través del MODULO FEEDBACK y del MODULO SEPUG de Moodle. La mayoría de los elementos clave para la creación encuestas 
+			<p align="justify">OpinaUGR descarga las encuestas que son creadas a través del MÓDULO FEEDBACK y del MÓDULO SEPUG de Moodle. La mayoría de los elementos clave para la creación encuestas 
 				estan soportados por la app, entre los que se encuentran:</p>
 			<p align="justify">- Etiqueta (label).</p>
 			<p align="justify">- Respuesta de texto corta (textfield).</p>
@@ -262,9 +274,10 @@
 
 	// --- Global Data ---
 	var URL = "";
+	var launchSiteURL = "";
+	var passport = 0;
 	var username = "";
 	var mytoken = 0;
-	var passport = 0;
 	var login_state = false;
 
 	document.addEventListener("deviceready", function(e) {
@@ -280,9 +293,16 @@
 
 		// Check if we have log in data from cache
 		recordar();
-
+		
 		// Performs log in process to obtain the token pass
-		login();
+		var lc = $("#login_check");
+		// If the box is checked, save the data
+		if(lc.is(":checked")){
+			customLogin();
+		}
+		else{
+			login();
+		}
 		
 		// Load main menu
 		if(login_state){

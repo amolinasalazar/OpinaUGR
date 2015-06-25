@@ -1091,7 +1091,7 @@ function customLogin(){
 /**
  * SAML login
  */
-function handleOpenURL(url) {
+function appLaunchedByURL(url) {
 
     url = url.replace("opinaugr://token=", "");
         	// Decode from base64.
@@ -1190,9 +1190,6 @@ function login(){
     },
         
     error:function(xhr, textStatus, errorThrown) {
-    	
-    	//SAML
-    	customLogin();
     	
         var error = "compruebe si los datos introducidos son correctos o intentelo de nuevo más tarde.";
         if (xhr.status == 404) {
