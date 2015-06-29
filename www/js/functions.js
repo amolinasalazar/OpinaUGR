@@ -1084,7 +1084,7 @@ function customLogin(){
 	passport = Math.random() * 1000;
 	
 	var launchSiteURL = URL + "/local/fbplugin/launch.php?service=" + WS_short_name + "&passport=" + passport;
-	var ref = windows.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
+	var ref = window.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
 	
 	
 	ref.addEventListener('loadstart', function(event) { 
