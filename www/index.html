@@ -30,14 +30,6 @@
     <script src="cordova.js"></script>
     <script src="js/functions.js"></script>
     <script src="js/configuration.js"></script>
-    <script>
-    	/**
-		 * Hook the return of the browser when server has custom login
-		 */
-		function handleOpenURL(url) {
-		    appLaunchedByURL(url);
-		}
-    </script>
 
 </head>
  
@@ -286,7 +278,20 @@
 		},3000);
 				
 	}, "false");
-
+	
+	
+	var lc = $("#login_check");
+	$("#login_check").change(
+    function(){
+        if (this.checked) {
+        	$("#nombredeusuario").textinput('disable');
+			$("#clave").textinput('disable');
+        }
+        else{
+        	$("#nombredeusuario").textinput('enable');
+			$("#clave").textinput('enable');
+        }
+    });
 
 	// Log In Button
 	$('#formulario').submit(function() {
@@ -295,7 +300,6 @@
 		recordar();
 		
 		// Performs log in process to obtain the token pass
-		var lc = $("#login_check");
 		// If the box is checked, save the data
 		if(lc.is(":checked")){
 			customLogin();
