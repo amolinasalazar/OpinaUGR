@@ -24,5 +24,8 @@ var login_img = 'img/prado2.png';
 // The URL that is loaded when you click the login image.
 var login_URL = 'http://niebla.ugr.es/moodletest';
 
+// The URL where launch.php is located (only for IDP login)
+var launch_URL = login_URL + "/local/fbplugin/launch.php?service=" + WS_short_name;
+
 
     	

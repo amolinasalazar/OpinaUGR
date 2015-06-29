@@ -1083,14 +1083,14 @@ function customLogin(){
 	URL = $('#urlsitio').val();
 	passport = Math.random() * 1000;
 	
-	var launchSiteURL = URL + "/local/fbplugin/launch.php?service=" + WS_short_name + "&passport=" + passport;
+	var launchSiteURL = launch_URL + "&passport=" + passport;
 	var ref = window.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
 	
 	
 	ref.addEventListener('loadstart', function(event) { 
-		ref.close();
 		var serverLaunchFound = event.url.search("opinaugr://token=");
 		if(serverLaunchFound!=-1){
+			ref.close();
 			appLaunchedByURL(event.url);
 		}
 	});
@@ -1098,7 +1098,6 @@ function customLogin(){
 	ref.addEventListener('loaderror', function(event) { 
 		ref.close();
 		navigator.notification.alert("No es posible cargar el sitio Web.", null, "Error");
-		return;
 	});
 	
     return;
