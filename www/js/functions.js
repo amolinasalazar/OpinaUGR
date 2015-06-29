@@ -1084,7 +1084,7 @@ function customLogin(){
 	passport = Math.random() * 1000;
 	
 	var launchSiteURL = URL + "/local/fbplugin/launch.php?service=" + WS_short_name + "&passport=" + passport;
-	var ref = cordova.InAppBrowser.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
+	var ref = windows.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
 	
 	
 	ref.addEventListener('loadstart', function(event) { 
@@ -1096,6 +1096,7 @@ function customLogin(){
 	});
 	
 	ref.addEventListener('loaderror', function(event) { 
+		ref.close();
 		navigator.notification.alert("No es posible cargar el sitio Web.", null, "Error");
 		return;
 	});
