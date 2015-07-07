@@ -1086,9 +1086,7 @@ function customLogin(){
 	var launchSiteURL = launch_URL + "&passport=" + passport;
 	ref = window.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
 	
-	
 	ref.addEventListener('loadstop', function(event) { 
-		alert(event.url);
 		var serverLaunchFound = event.url.search("opinaugr://token=");
 		if(serverLaunchFound!=-1){
 			appLaunchedByURL(event.url);
