@@ -25,7 +25,7 @@
     <preference name="android-installLocation" value="auto" />
 	
 	<gap:plugin name="cordova-plugin-dialogs" source="npm" />
-	<gap:plugin name="org.apache.cordova.inappbrowser" version="0.5.2" />
+	<gap:plugin name="org.apache.cordova.inappbrowser" source="npm" />
 	<gap:plugin name="org.apache.cordova.splashscreen" version="0.3.4" />
 	
 	<icon src="icon.png" />

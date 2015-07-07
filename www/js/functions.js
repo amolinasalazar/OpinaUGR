@@ -1084,7 +1084,7 @@ function customLogin(){
 	passport = Math.random() * 1000;
 	
 	var launchSiteURL = launch_URL + "&passport=" + passport;
-	var ref = window.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
+	ref = window.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
 	
 	
 	ref.addEventListener('loadstop', function(event) { 
@@ -1097,7 +1097,7 @@ function customLogin(){
 	
 	ref.addEventListener('loaderror', function(event) { 
 		ref.close();
-		navigator.notification.alert("No es posible cargar el sitio Web.", null, "Error");
+		navigator.notification.alert("No es posible cargar el sitio Web: "+event.url, null, "Error");
 	});
 	
     return;
