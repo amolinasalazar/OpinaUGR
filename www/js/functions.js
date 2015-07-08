@@ -1090,7 +1090,6 @@ function customLogin(){
 		var serverLaunchFound = event.url.search("opinaugr://token=");
 		if(serverLaunchFound!=-1){
 			appLaunchedByURL(event.url);
-			ref.close();
 		}
 	});
 	
@@ -1106,11 +1105,15 @@ function customLogin(){
  * SAML login
  */
 function appLaunchedByURL(url) {
-
+alert("1");
     url = url.replace("opinaugr://token=", "");
+    alert("2");
     url = atob(url);
+    alert("3");
     var params = url.split(":::");
+    alert("4");
     var signature = hex_md5(launchSiteURL + passport);
+    alert("5");
 
     if (signature != params[0]) {
 	    if (launchSiteURL.indexOf("https://") != -1) {
@@ -1120,17 +1123,21 @@ function appLaunchedByURL(url) {
 	    }
 	    signature = hex_md5(launchSiteURL + passport);
 	}
-	
+	alert("6");
     if (signature == params[0]) {
+    	alert("7");
 		URL = launchSiteURL;
         login_state = true;
         mytoken = params[1];
         cargarHome();
+        ref.close();
         return;
         		
     } else {
+    	alert("8");
       	console.log("Invalid signature in the URL request yours: " + params[0] + " mine: " + signature + "for passport " + passport);
         login_state = false;
+        ref.close();
     }
     return;
 
