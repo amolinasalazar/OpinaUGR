@@ -1084,7 +1084,7 @@ function customLogin(){
 	passport = Math.random() * 1000;
 	
 	var launchSiteURL = launch_URL + "&passport=" + passport;
-	ref = window.open(encodeURI(launchSiteURL), '_blank', 'location=yes');
+	ref = window.open(encodeURI(launchSiteURL), '_system', 'location=yes');
 	
 	ref.addEventListener('loadstop', function(event) { 
 		var serverLaunchFound = event.url.search("opinaugr://token=");
@@ -1105,15 +1105,10 @@ function customLogin(){
  * SAML login
  */
 function appLaunchedByURL(url) {
-alert("1");
     url = url.replace("opinaugr://token=", "");
-    alert("2");
     url = atob(url);
-    alert("3");
     var params = url.split(":::");
-    alert("4");
     var signature = hex_md5(launchSiteURL + passport);
-    alert("5");
 
     if (signature != params[0]) {
 	    if (launchSiteURL.indexOf("https://") != -1) {
@@ -1123,9 +1118,8 @@ alert("1");
 	    }
 	    signature = hex_md5(launchSiteURL + passport);
 	}
-	alert("6");
+
     if (signature == params[0]) {
-    	alert("7");
 		URL = launchSiteURL;
         login_state = true;
         mytoken = params[1];
@@ -1134,7 +1128,6 @@ alert("1");
         return;
         		
     } else {
-    	alert("8");
       	console.log("Invalid signature in the URL request yours: " + params[0] + " mine: " + signature + "for passport " + passport);
         login_state = false;
         ref.close();
